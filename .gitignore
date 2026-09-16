@@ -1,0 +1,20 @@
+node_modules/
+
+# Secrets: never commit real keys
+.env
+.env.*
+!.env.example
+
+# Run outputs (regenerable). The committed sample lives in examples/.
+clients/*/runs/
+.demo-runs/
+
+*.log
+.DS_Store
+
+# Local environments and caches
+.venv/
+venv/
+.next/
+__pycache__/
+coverage/

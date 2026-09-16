@@ -1,0 +1,33 @@
+{
+  "name": "content-engine-multiagent",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Five-step LLM content-strategy pipeline with JSON Schema contracts between agents, deterministic guardrails and an offline mock provider.",
+  "license": "MIT",
+  "author": "Noel Aliaga",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "demo": "node bin/run-pipeline.js quillfern demo --runs-dir .demo-runs --overwrite",
+    "pipeline": "node bin/run-pipeline.js",
+    "pipeline:live": "node bin/run-pipeline.js --live",
+    "new-client": "node bin/new-client.js",
+    "dashboard": "node bin/build-dashboard.js",
+    "example": "node bin/run-pipeline.js quillfern example --runs-dir examples --overwrite",
+    "test": "node --test \"tests/**/*.test.js\"",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "typecheck": "tsc -p tsconfig.json",
+    "check": "npm run lint && npm run typecheck && npm test && npm run demo"
+  },
+  "dependencies": {
+    "ajv": "8.20.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.13",
+    "@types/node": "24.13.4",
+    "typescript": "5.9.3"
+  }
+}
