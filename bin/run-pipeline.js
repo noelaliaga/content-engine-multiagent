@@ -17,6 +17,7 @@ Options:
   --runs-dir <dir>  Write the run under <dir> instead of clients/<client>/runs
   --overwrite       Replace an existing run directory with the same id
   --no-dashboard    Skip dashboard.html generation
+  --now <iso>       Freeze the clock at this ISO timestamp (reproducible run ids and timestamps)
   --root <dir>      Project root containing engine/ and clients/ (default: this repo)
   -h, --help        Show this help`;
 
@@ -29,6 +30,7 @@ async function main() {
       overwrite: { type: 'boolean', default: false },
       'no-dashboard': { type: 'boolean', default: false },
       root: { type: 'string' },
+      now: { type: 'string' },
       help: { type: 'boolean', short: 'h', default: false },
     },
   });
@@ -40,6 +42,17 @@ async function main() {
   if (!clientSlug) {
     console.error(USAGE);
     return 2;
+  }
+
+  /** @type {(() => Date) | undefined} */
+  let now;
+  if (values.now !== undefined) {
+    const frozen = new Date(values.now);
+    if (Number.isNaN(frozen.getTime())) {
+      console.error(`--now must be an ISO timestamp, got "${values.now}"`);
+      return 2;
+    }
+    now = () => new Date(frozen);
   }
 
   const rootDir = path.resolve(values.root ?? path.join(path.dirname(fileURLToPath(import.meta.url)), '..'));
@@ -71,6 +84,7 @@ async function main() {
     provider,
     runsDir: values['runs-dir'] ? path.resolve(values['runs-dir']) : undefined,
     overwrite: values.overwrite,
+    now,
     log: (message) => console.log(message),
   });
 

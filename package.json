@@ -15,7 +15,7 @@
     "pipeline:live": "node bin/run-pipeline.js --live",
     "new-client": "node bin/new-client.js",
     "dashboard": "node bin/build-dashboard.js",
-    "example": "node bin/run-pipeline.js quillfern example --runs-dir examples --overwrite",
+    "example": "node bin/run-pipeline.js quillfern example --runs-dir examples --overwrite --now 2030-01-02T03:04:05.000Z",
     "test": "node --test \"tests/**/*.test.js\"",
     "lint": "biome check .",
     "format": "biome check --write .",

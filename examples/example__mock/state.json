@@ -4,57 +4,61 @@
   "provider": "mock-fixtures",
   "offline": true,
   "status": "completed",
-  "started_at": "2026-09-16T18:41:22.665Z",
+  "started_at": "2030-01-02T03:04:05.000Z",
   "steps": [
     {
       "id": "brand_analyst",
       "status": "completed",
       "model": "mock-fixtures (offline)",
       "attempts": 1,
-      "started_at": "2026-09-16T18:41:22.666Z",
+      "started_at": "2030-01-02T03:04:05.000Z",
       "rejected_attempts": [],
       "adjustments": [],
-      "finished_at": "2026-09-16T18:41:22.667Z"
+      "finished_at": "2030-01-02T03:04:05.000Z"
     },
     {
       "id": "growth_strategist",
       "status": "completed",
       "model": "mock-fixtures (offline)",
       "attempts": 1,
-      "started_at": "2026-09-16T18:41:22.667Z",
+      "started_at": "2030-01-02T03:04:05.000Z",
       "rejected_attempts": [],
       "adjustments": [],
-      "finished_at": "2026-09-16T18:41:22.668Z"
+      "finished_at": "2030-01-02T03:04:05.000Z"
     },
     {
       "id": "content_ideation",
       "status": "completed",
       "model": "mock-fixtures (offline)",
       "attempts": 1,
-      "started_at": "2026-09-16T18:41:22.668Z",
+      "started_at": "2030-01-02T03:04:05.000Z",
       "rejected_attempts": [],
       "adjustments": [],
-      "finished_at": "2026-09-16T18:41:22.669Z"
+      "finished_at": "2030-01-02T03:04:05.000Z"
     },
     {
       "id": "content_qa",
       "status": "completed",
       "model": "mock-fixtures (offline)",
       "attempts": 1,
-      "started_at": "2026-09-16T18:41:22.669Z",
+      "started_at": "2030-01-02T03:04:05.000Z",
       "rejected_attempts": [],
-      "adjustments": [],
-      "finished_at": "2026-09-16T18:41:22.670Z"
+      "adjustments": [
+        "idea_08: claim_safety 0 forces rejected (average 3 alone would be revise)"
+      ],
+      "finished_at": "2030-01-02T03:04:05.000Z"
     },
     {
       "id": "orchestrator",
       "status": "completed",
       "model": "mock-fixtures (offline)",
       "attempts": 1,
-      "started_at": "2026-09-16T18:41:22.670Z",
+      "started_at": "2030-01-02T03:04:05.000Z",
       "rejected_attempts": [],
-      "adjustments": [],
-      "finished_at": "2026-09-16T18:41:22.671Z"
+      "adjustments": [
+        "learning_log_entry.run_id \"set-by-engine\" -> \"example\""
+      ],
+      "finished_at": "2030-01-02T03:04:05.000Z"
     }
   ],
   "usage_total": {
@@ -62,5 +66,5 @@
     "input_tokens": 0,
     "output_tokens": 0
   },
-  "completed_at": "2026-09-16T18:41:22.671Z"
+  "completed_at": "2030-01-02T03:04:05.000Z"
 }
