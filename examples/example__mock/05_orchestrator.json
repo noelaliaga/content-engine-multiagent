@@ -1,0 +1,105 @@
+{
+  "calendar_7_days": [
+    {
+      "day": "Monday",
+      "date_label": "Day 1",
+      "idea_id": "idea_01",
+      "format": "reel",
+      "pillar": "Rescue with a bridge",
+      "intended_action": "reach",
+      "status": "approved"
+    },
+    {
+      "day": "Tuesday",
+      "date_label": "Day 2",
+      "idea_id": "idea_03",
+      "format": "carousel",
+      "pillar": "First-90-days confidence",
+      "intended_action": "nurture",
+      "status": "approved"
+    },
+    {
+      "day": "Wednesday",
+      "date_label": "Day 3",
+      "idea_id": "idea_05",
+      "format": "reel",
+      "pillar": "Subscriber proof",
+      "intended_action": "convert",
+      "status": "approved"
+    },
+    {
+      "day": "Thursday",
+      "date_label": "Day 4",
+      "idea_id": "idea_02",
+      "format": "short",
+      "pillar": "Rescue with a bridge",
+      "intended_action": "reach",
+      "status": "approved"
+    },
+    {
+      "day": "Friday",
+      "date_label": "Day 5",
+      "idea_id": "idea_06",
+      "format": "carousel",
+      "pillar": "Subscriber proof",
+      "intended_action": "convert",
+      "status": "approved"
+    },
+    {
+      "day": "Saturday",
+      "date_label": "Day 6",
+      "idea_id": "idea_04",
+      "format": "email",
+      "pillar": "First-90-days confidence",
+      "intended_action": "nurture",
+      "status": "approved"
+    },
+    {
+      "day": "Sunday",
+      "date_label": "Day 7",
+      "idea_id": "idea_07",
+      "format": "story",
+      "pillar": "First-90-days confidence",
+      "intended_action": "nurture",
+      "status": "revise_before_publish"
+    }
+  ],
+  "metrics_to_track": [
+    {
+      "metric": "RESCUE keyword DMs per rescue reel",
+      "why_it_matters": "Measures whether the new bridge turns reach into conversations.",
+      "target_signal": "DMs rise on reels that include the bridge versus previous rescue reels"
+    },
+    {
+      "metric": "Link-in-bio clicks on subscriber-proof days",
+      "why_it_matters": "Tests whether proof content moves people toward the offer.",
+      "target_signal": "Clicks on proof days above the weekly average"
+    },
+    {
+      "metric": "Saves on care-education carousels",
+      "why_it_matters": "Saves indicate content people plan to use during month two.",
+      "target_signal": "Saves per reach higher than on shelf-tour posts"
+    }
+  ],
+  "learning_log_entry": {
+    "run_id": "example",
+    "what_worked": [
+      "Rescue reels with an explicit bridge scored highest on hook and pillar fit.",
+      "Subscriber-proof ideas reached the maximum offer-connection score."
+    ],
+    "what_was_rejected_and_why": [
+      "idea_08 was rejected: claim_safety 0 for promising a plant that never dies."
+    ],
+    "next_run_recommendations": [
+      "Collect subscriber consent in advance so proof pieces are feasible.",
+      "Batch plant-doctor submissions to make the weekly story producible.",
+      "SYNTHETIC FIXTURE: hand-written sample, not model output."
+    ]
+  },
+  "honesty_notes": [
+    "Inputs are curated by hand from manual or public observations; there is no live connection to any social network.",
+    "Memory is an append-only learning log, not a trained model.",
+    "The system adapts observed patterns; it does not copy third-party content verbatim.",
+    "Generated content is a starting point for human review, not a performance prediction."
+  ]
+}

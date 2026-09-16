@@ -1,0 +1,45 @@
+{
+  "positioning_statement": "Quillfern is the calm plant-care companion that gets beginners past the first struggling month, without promising that any plant cannot die.",
+  "target_audience": "Renters aged roughly 25-39 who have already lost at least one houseplant, like plant content, and hesitate to spend money on plants again.",
+  "content_pillars": [
+    {
+      "pillar": "Rescue with a bridge",
+      "purpose": "reach",
+      "rationale": "Keeps the rescue before/after reach engine (strength) and fixes the missing conversion bridge (gap 1).",
+      "patterns_to_use": [
+        "Plant rescue before/after",
+        "Result reveal"
+      ]
+    },
+    {
+      "pillar": "First-90-days confidence",
+      "purpose": "nurture",
+      "rationale": "Answers the positioning gap (gap 3) with care education aimed at month-two struggles.",
+      "patterns_to_use": [
+        "Plant-doctor Q&A",
+        "Common mistake"
+      ]
+    },
+    {
+      "pillar": "Subscriber proof",
+      "purpose": "convert",
+      "rationale": "Closes the trust gap (gap 2) with real subscriber journeys connected to the offer.",
+      "patterns_to_use": [
+        "Social proof",
+        "Transformation"
+      ]
+    }
+  ],
+  "content_mix": {
+    "market_proven_patterns": 80,
+    "original_experiments": 20,
+    "reach": 35,
+    "nurture": 35,
+    "convert": 30
+  },
+  "strategic_notes": [
+    "Do not replace the ASMR repotting reels; add a closing bridge instead.",
+    "Every subscriber story needs the subscriber's consent before publishing.",
+    "SYNTHETIC FIXTURE: hand-written sample, not model output."
+  ]
+}

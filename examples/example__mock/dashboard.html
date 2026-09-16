@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quillfern Plant Co. · run example__mock · content engine</title>
+<!-- Self-contained run viewer: no external fonts, scripts or requests. Data is injected by src/dashboard.js. -->
+<style>
+  :root {
+    --bg: #f6f5f1; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6a64; --line: #e3e1da;
+    --accent: #2f6f4f; --ok: #2f7d4f; --warn: #a86b00; --bad: #b3372b; --chip: #efede6;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #151614; --panel: #1f201d; --ink: #ecebe6; --muted: #a09f98; --line: #34352f; --chip: #2a2b27; --accent: #6fbf94; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-size: 14px; line-height: 1.5; }
+  header { padding: 20px 24px 12px; border-bottom: 1px solid var(--line); }
+  header h1 { margin: 0; font-size: 20px; }
+  header p { margin: 4px 0 0; color: var(--muted); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; background: var(--chip); font-size: 12px; margin-right: 6px; }
+  .badge.mode { background: var(--accent); color: #fff; }
+  nav { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 24px; border-bottom: 1px solid var(--line); }
+  nav button { border: 1px solid var(--line); background: var(--panel); color: var(--ink); padding: 8px 12px; border-radius: 8px; cursor: pointer; font: inherit; }
+  nav button[aria-selected="true"] { border-color: var(--accent); box-shadow: inset 0 -2px 0 var(--accent); }
+  main { padding: 20px 24px 40px; max-width: 1100px; }
+  section[hidden] { display: none; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; }
+  .panel h2 { margin: 0 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  ul { margin: 0; padding-left: 18px; }
+  li { margin: 4px 0; }
+  .tag { font-size: 12px; color: var(--muted); }
+  .hyp { border-left: 3px solid var(--warn); padding-left: 8px; }
+  .stats { display: flex; flex-wrap: wrap; gap: 12px; }
+  .stat { flex: 1 1 120px; text-align: center; }
+  .stat b { display: block; font-size: 26px; }
+  .approved { color: var(--ok); } .revise { color: var(--warn); } .rejected { color: var(--bad); }
+  .bar { display: flex; height: 12px; border-radius: 6px; overflow: hidden; background: var(--chip); margin: 6px 0; }
+  .bar span { display: block; height: 100%; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .scroll { overflow-x: auto; }
+  footer { color: var(--muted); font-size: 12px; padding: 0 24px 24px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Quillfern Plant Co. <span class="tag">@quillfern.example</span></h1>
+  <p><span class="badge mode">Offline demo · synthetic fixtures</span><span class="badge">run example__mock</span><span class="badge">5 steps</span></p>
+</header>
+<nav role="tablist">
+  <button role="tab" data-view="brand" aria-selected="true">01 Brand Analyst</button>
+  <button role="tab" data-view="growth" aria-selected="false">02 Growth Strategist</button>
+  <button role="tab" data-view="ideation" aria-selected="false">03 Content Ideation</button>
+  <button role="tab" data-view="qa" aria-selected="false">04 Content QA</button>
+  <button role="tab" data-view="orchestrator" aria-selected="false">05 Orchestrator</button>
+</nav>
+<main>
+  <section id="view-brand"></section>
+  <section id="view-growth" hidden></section>
+  <section id="view-ideation" hidden></section>
+  <section id="view-qa" hidden></section>
+  <section id="view-orchestrator" hidden></section>
+</main>
+<footer>Generated from the run's JSON outputs. Content is a starting point for human review, not a performance prediction.</footer>
+<script>
+const brandAnalystData = {
+  "current_positioning": "The feed positions Quillfern as a calm, satisfying plant-ASMR channel rather than as the subscription that keeps beginners' plants alive: the reach comes from repotting spectacle, while the offer (care kit + plant-care chat) is almost invisible.",
+  "strengths": [
+    "Repotting and propagation reels with ASMR audio are a reliable reach engine for the brand.",
+    "Rescued-plant before/after transformations already show the exact outcome beginners want.",
+    "The warm, non-shaming tone matches a buyer persona that feels 'bad with plants'."
+  ],
+  "gaps": [
+    {
+      "gap": "Rescue transformations end without any bridge to the subscription or the RESCUE checklist DM.",
+      "type": "conversion",
+      "why_it_matters": "The goal is trial subscriptions from Instagram; the highest-reach format currently sends viewers nowhere near the offer."
+    },
+    {
+      "gap": "Subscriber testimonials are nearly absent from the feed.",
+      "type": "trust",
+      "why_it_matters": "Beginners who have already killed plants doubt they can succeed; third-party proof is what lowers that perceived risk."
+    },
+    {
+      "gap": "Shelf tours and aesthetic posts outnumber care education.",
+      "type": "positioning",
+      "why_it_matters": "The feed signals 'plant decor' instead of 'we keep your plant alive', which is the subscription's real promise."
+    }
+  ],
+  "viral_patterns_observed": [
+    {
+      "pattern": "Plant rescue before/after",
+      "source_reference": "competitor_context.observed_patterns[0] and the brand's own rescue reels",
+      "hook_mechanic": "Dying plant in the first frame, healthy plant revealed at the end",
+      "format": "30-second reel",
+      "emotion": "relief",
+      "funnel_stage": "TOFU",
+      "commercial_intent": "low",
+      "why_it_works": "It dramatises the beginner's fear and its resolution in seconds.",
+      "adaptation_opportunity": "End on the care step that saved the plant and point to the RESCUE checklist.",
+      "risk_if_overused": "Turns into spectacle with no bridge to the offer."
+    },
+    {
+      "pattern": "Plant-doctor Q&A",
+      "source_reference": "competitor_context.observed_patterns[1]",
+      "hook_mechanic": "Common mistake called out in the first line",
+      "format": "talking-head short",
+      "emotion": "recognition",
+      "funnel_stage": "MOFU",
+      "commercial_intent": "medium",
+      "why_it_works": "Answering a real follower question signals expertise and access to help.",
+      "adaptation_opportunity": "Frame answers as a preview of the plant-care chat included in the subscription.",
+      "risk_if_overused": "Feels like homework if every video is a lesson."
+    }
+  ],
+  "opportunity_angles": [
+    {
+      "angle": "Rescue reels that end with the care routine and the RESCUE DM keyword",
+      "why": "Keeps the reach engine intact while adding the missing conversion bridge."
+    },
+    {
+      "angle": "Month-two subscriber stories",
+      "why": "Addresses the trust gap exactly where beginners are most likely to give up."
+    }
+  ],
+  "confidence_notes": "SYNTHETIC FIXTURE: hand-written sample output for the fictional Quillfern client, used by the offline demo and tests. It is not model output. On this synthetic evidence, hypotheses 1 and 2 are supported by the input; hypothesis 3 is plausible but only partially supported, because no post counts are provided."
+};
+
+const growthStrategistData = {
+  "positioning_statement": "Quillfern is the calm plant-care companion that gets beginners past the first struggling month, without promising that any plant cannot die.",
+  "target_audience": "Renters aged roughly 25-39 who have already lost at least one houseplant, like plant content, and hesitate to spend money on plants again.",
+  "content_pillars": [
+    {
+      "pillar": "Rescue with a bridge",
+      "purpose": "reach",
+      "rationale": "Keeps the rescue before/after reach engine (strength) and fixes the missing conversion bridge (gap 1).",
+      "patterns_to_use": [
+        "Plant rescue before/after",
+        "Result reveal"
+      ]
+    },
+    {
+      "pillar": "First-90-days confidence",
+      "purpose": "nurture",
+      "rationale": "Answers the positioning gap (gap 3) with care education aimed at month-two struggles.",
+      "patterns_to_use": [
+        "Plant-doctor Q&A",
+        "Common mistake"
+      ]
+    },
+    {
+      "pillar": "Subscriber proof",
+      "purpose": "convert",
+      "rationale": "Closes the trust gap (gap 2) with real subscriber journeys connected to the offer.",
+      "patterns_to_use": [
+        "Social proof",
+        "Transformation"
+      ]
+    }
+  ],
+  "content_mix": {
+    "market_proven_patterns": 80,
+    "original_experiments": 20,
+    "reach": 35,
+    "nurture": 35,
+    "convert": 30
+  },
+  "strategic_notes": [
+    "Do not replace the ASMR repotting reels; add a closing bridge instead.",
+    "Every subscriber story needs the subscriber's consent before publishing.",
+    "SYNTHETIC FIXTURE: hand-written sample, not model output."
+  ]
+};
+
+const contentIdeationData = {
+  "ideas": [
+    {
+      "id": "idea_01",
+      "pillar": "Rescue with a bridge",
+      "format": "reel",
+      "hook": "This pothos was one watering away from the bin.",
+      "concept": "ASMR rescue of an overwatered pothos that ends on the three-step routine that saved it.",
+      "script_outline": {
+        "opening": "Close-up of yellow, drooping leaves and soggy soil.",
+        "body": "Unpot, trim rotten roots, fresh soil mix, all with ASMR audio.",
+        "turn": "Two weeks later: new leaf; the fix was watering less, not more.",
+        "cta": "DM RESCUE for the checklist we used."
+      },
+      "intended_action": "reach",
+      "pattern_source": "Plant rescue before/after",
+      "why_this_could_work": "Keeps the reach format and adds the missing bridge to the checklist DM.",
+      "cta": "DM RESCUE"
+    },
+    {
+      "id": "idea_02",
+      "pillar": "Rescue with a bridge",
+      "format": "short",
+      "hook": "Guess what killed this calathea. It was not the light.",
+      "concept": "Open-loop rescue: viewers guess the cause, the answer arrives with the fix.",
+      "script_outline": {
+        "opening": "Crispy calathea on a sunny shelf.",
+        "body": "Rule out light and water on screen, one by one.",
+        "turn": "Reveal: tap-water minerals; show the swap to filtered water.",
+        "cta": "Comment your guess, then DM RESCUE for the checklist."
+      },
+      "intended_action": "reach",
+      "pattern_source": "Open loop",
+      "why_this_could_work": "Comment-driven reach plus a bridge to the checklist.",
+      "cta": "Comment + DM RESCUE"
+    },
+    {
+      "id": "idea_03",
+      "pillar": "First-90-days confidence",
+      "format": "carousel",
+      "hook": "Month two is when most beginner plants struggle. Here is what is normal.",
+      "concept": "Slide-by-slide guide separating normal month-two changes from real warning signs.",
+      "script_outline": {
+        "opening": "Cover: 'Normal or problem?'",
+        "body": "Five common changes, each labelled normal or act-now.",
+        "turn": "The most common 'problem' is actually normal acclimatisation.",
+        "cta": "Save this for week six."
+      },
+      "intended_action": "nurture",
+      "pattern_source": "Myth vs reality",
+      "why_this_could_work": "Care education aimed at the churn-prone month, answering the positioning gap.",
+      "cta": "Save"
+    },
+    {
+      "id": "idea_04",
+      "pillar": "First-90-days confidence",
+      "format": "email",
+      "hook": "Your plant is not dying, it is moving house.",
+      "concept": "Welcome-series email explaining acclimatisation for new subscribers.",
+      "script_outline": {
+        "opening": "Reassure: leaf drop in week one is expected.",
+        "body": "Three things to check and one thing to leave alone.",
+        "turn": "Doing less is the hardest and most useful step.",
+        "cta": "Reply with a photo and the plant-care chat will take a look."
+      },
+      "intended_action": "nurture",
+      "pattern_source": "Teach-a-piece",
+      "why_this_could_work": "Reduces early anxiety for subscribers and showcases the chat.",
+      "cta": "Reply with a photo"
+    },
+    {
+      "id": "idea_05",
+      "pillar": "Subscriber proof",
+      "format": "reel",
+      "hook": "She had killed four plants before this one.",
+      "concept": "A (consenting) subscriber's first 90 days, told through her own chat messages.",
+      "script_outline": {
+        "opening": "Screenshot of her first worried message.",
+        "body": "Three chat moments: overwatering, light, a new leaf.",
+        "turn": "Her fifth plant is the one still alive.",
+        "cta": "Start your first kit from the link in bio."
+      },
+      "intended_action": "convert",
+      "pattern_source": "Social proof",
+      "why_this_could_work": "Third-party proof aimed at the exact fear of the buyer persona.",
+      "cta": "Link in bio"
+    },
+    {
+      "id": "idea_06",
+      "pillar": "Subscriber proof",
+      "format": "carousel",
+      "hook": "What 'bad with plants' looked like after one month of the kit.",
+      "concept": "Before/after photos from three consenting subscribers with one lesson each.",
+      "script_outline": {
+        "opening": "Cover with three month-one photos.",
+        "body": "One slide per subscriber: problem, chat tip, result.",
+        "turn": "None of them changed flats or bought grow lights.",
+        "cta": "See what is in this month's kit via the link in bio."
+      },
+      "intended_action": "convert",
+      "pattern_source": "Before/after",
+      "why_this_could_work": "Combines proof and a clear bridge to the offer.",
+      "cta": "Link in bio"
+    },
+    {
+      "id": "idea_07",
+      "pillar": "First-90-days confidence",
+      "format": "story",
+      "hook": "Plant doctor is in: send us your saddest leaf.",
+      "concept": "Weekly story Q&A answering follower photos live.",
+      "script_outline": {
+        "opening": "Question sticker inviting photos.",
+        "body": "Answer three submissions with quick fixes.",
+        "turn": "Show that most fixes cost nothing.",
+        "cta": "Subscribers get this in the chat every day."
+      },
+      "intended_action": "nurture",
+      "pattern_source": "Plant-doctor Q&A",
+      "why_this_could_work": "Builds trust through visible help; depends on weekly availability.",
+      "cta": "Mention the chat"
+    },
+    {
+      "id": "idea_08",
+      "pillar": "Subscriber proof",
+      "format": "ad",
+      "hook": "Our plants never die. Guaranteed.",
+      "concept": "Paid ad promising a plant that cannot die with the subscription.",
+      "script_outline": {
+        "opening": "Healthy plant spinning on a turntable.",
+        "body": "Bold text: 'never dies, guaranteed'.",
+        "turn": "Price reveal.",
+        "cta": "Subscribe now."
+      },
+      "intended_action": "convert",
+      "pattern_source": "Result reveal",
+      "why_this_could_work": "Direct offer, but relies on a guaranteed-outcome claim.",
+      "cta": "Subscribe now"
+    }
+  ]
+};
+
+const contentQaData = {
+  "reviewed": [
+    {
+      "id": "idea_01",
+      "scores": {
+        "on_brand": 5,
+        "hook_strength": 5,
+        "pillar_fit": 5,
+        "offer_connection": 3,
+        "feasibility": 4,
+        "originality": 4,
+        "claim_safety": 5
+      },
+      "average_score": 4.43,
+      "verdict": "approved",
+      "reason": "Hook and pillar fit are 5; offer connection is 3 because the checklist is one step away from the subscription.",
+      "improvement_suggestion": "Mention in the checklist DM that the kit includes the same routine."
+    },
+    {
+      "id": "idea_02",
+      "scores": {
+        "on_brand": 4,
+        "hook_strength": 4,
+        "pillar_fit": 5,
+        "offer_connection": 3,
+        "feasibility": 5,
+        "originality": 3,
+        "claim_safety": 5
+      },
+      "average_score": 4.14,
+      "verdict": "approved",
+      "reason": "Strong pillar fit and feasibility (5); originality is 3 because open-loop rescues are common.",
+      "improvement_suggestion": "Pin the answer comment to keep the loop tidy."
+    },
+    {
+      "id": "idea_03",
+      "scores": {
+        "on_brand": 5,
+        "hook_strength": 4,
+        "pillar_fit": 5,
+        "offer_connection": 4,
+        "feasibility": 4,
+        "originality": 4,
+        "claim_safety": 5
+      },
+      "average_score": 4.43,
+      "verdict": "approved",
+      "reason": "On-brand and pillar fit are 5; addresses the churn-prone month directly.",
+      "improvement_suggestion": "Add a final slide pointing to the plant-care chat."
+    },
+    {
+      "id": "idea_04",
+      "scores": {
+        "on_brand": 4,
+        "hook_strength": 3,
+        "pillar_fit": 5,
+        "offer_connection": 4,
+        "feasibility": 5,
+        "originality": 3,
+        "claim_safety": 5
+      },
+      "average_score": 4.14,
+      "verdict": "approved",
+      "reason": "Pillar fit and feasibility are 5; hook strength is 3, acceptable for an email.",
+      "improvement_suggestion": "Test a subject line that names the plant type."
+    },
+    {
+      "id": "idea_05",
+      "scores": {
+        "on_brand": 5,
+        "hook_strength": 4,
+        "pillar_fit": 5,
+        "offer_connection": 5,
+        "feasibility": 3,
+        "originality": 4,
+        "claim_safety": 5
+      },
+      "average_score": 4.43,
+      "verdict": "approved",
+      "reason": "Offer connection is 5; feasibility is 3 because it needs a consenting subscriber.",
+      "improvement_suggestion": "Confirm written consent before scheduling."
+    },
+    {
+      "id": "idea_06",
+      "scores": {
+        "on_brand": 4,
+        "hook_strength": 4,
+        "pillar_fit": 4,
+        "offer_connection": 5,
+        "feasibility": 4,
+        "originality": 3,
+        "claim_safety": 5
+      },
+      "average_score": 4.14,
+      "verdict": "approved",
+      "reason": "Offer connection is 5; originality is 3 because before/after carousels are common.",
+      "improvement_suggestion": "Use the subscribers' own words on each slide."
+    },
+    {
+      "id": "idea_07",
+      "scores": {
+        "on_brand": 4,
+        "hook_strength": 3,
+        "pillar_fit": 4,
+        "offer_connection": 3,
+        "feasibility": 4,
+        "originality": 3,
+        "claim_safety": 5
+      },
+      "average_score": 3.71,
+      "verdict": "revise",
+      "reason": "Hook strength and offer connection are 3; depends on weekly live availability.",
+      "improvement_suggestion": "Pre-collect submissions so the story can be batched."
+    },
+    {
+      "id": "idea_08",
+      "scores": {
+        "on_brand": 2,
+        "hook_strength": 4,
+        "pillar_fit": 2,
+        "offer_connection": 3,
+        "feasibility": 4,
+        "originality": 2,
+        "claim_safety": 0
+      },
+      "average_score": 2.43,
+      "verdict": "rejected",
+      "reason": "claim_safety is 0: 'never dies, guaranteed' violates the no-guaranteed-results constraint; on-brand is 2.",
+      "improvement_suggestion": "Replace the guarantee with the real promise: help from the plant-care chat when something goes wrong."
+    }
+  ],
+  "summary": {
+    "approved": 6,
+    "revise": 1,
+    "rejected": 1
+  }
+};
+
+const orchestratorFinalData = {
+  "calendar_7_days": [
+    {
+      "day": "Monday",
+      "date_label": "Day 1",
+      "idea_id": "idea_01",
+      "format": "reel",
+      "pillar": "Rescue with a bridge",
+      "intended_action": "reach",
+      "status": "approved"
+    },
+    {
+      "day": "Tuesday",
+      "date_label": "Day 2",
+      "idea_id": "idea_03",
+      "format": "carousel",
+      "pillar": "First-90-days confidence",
+      "intended_action": "nurture",
+      "status": "approved"
+    },
+    {
+      "day": "Wednesday",
+      "date_label": "Day 3",
+      "idea_id": "idea_05",
+      "format": "reel",
+      "pillar": "Subscriber proof",
+      "intended_action": "convert",
+      "status": "approved"
+    },
+    {
+      "day": "Thursday",
+      "date_label": "Day 4",
+      "idea_id": "idea_02",
+      "format": "short",
+      "pillar": "Rescue with a bridge",
+      "intended_action": "reach",
+      "status": "approved"
+    },
+    {
+      "day": "Friday",
+      "date_label": "Day 5",
+      "idea_id": "idea_06",
+      "format": "carousel",
+      "pillar": "Subscriber proof",
+      "intended_action": "convert",
+      "status": "approved"
+    },
+    {
+      "day": "Saturday",
+      "date_label": "Day 6",
+      "idea_id": "idea_04",
+      "format": "email",
+      "pillar": "First-90-days confidence",
+      "intended_action": "nurture",
+      "status": "approved"
+    },
+    {
+      "day": "Sunday",
+      "date_label": "Day 7",
+      "idea_id": "idea_07",
+      "format": "story",
+      "pillar": "First-90-days confidence",
+      "intended_action": "nurture",
+      "status": "revise_before_publish"
+    }
+  ],
+  "metrics_to_track": [
+    {
+      "metric": "RESCUE keyword DMs per rescue reel",
+      "why_it_matters": "Measures whether the new bridge turns reach into conversations.",
+      "target_signal": "DMs rise on reels that include the bridge versus previous rescue reels"
+    },
+    {
+      "metric": "Link-in-bio clicks on subscriber-proof days",
+      "why_it_matters": "Tests whether proof content moves people toward the offer.",
+      "target_signal": "Clicks on proof days above the weekly average"
+    },
+    {
+      "metric": "Saves on care-education carousels",
+      "why_it_matters": "Saves indicate content people plan to use during month two.",
+      "target_signal": "Saves per reach higher than on shelf-tour posts"
+    }
+  ],
+  "learning_log_entry": {
+    "run_id": "example",
+    "what_worked": [
+      "Rescue reels with an explicit bridge scored highest on hook and pillar fit.",
+      "Subscriber-proof ideas reached the maximum offer-connection score."
+    ],
+    "what_was_rejected_and_why": [
+      "idea_08 was rejected: claim_safety 0 for promising a plant that never dies."
+    ],
+    "next_run_recommendations": [
+      "Collect subscriber consent in advance so proof pieces are feasible.",
+      "Batch plant-doctor submissions to make the weekly story producible.",
+      "SYNTHETIC FIXTURE: hand-written sample, not model output."
+    ]
+  },
+  "honesty_notes": [
+    "Inputs are curated by hand from manual or public observations; there is no live connection to any social network.",
+    "Memory is an append-only learning log, not a trained model.",
+    "The system adapts observed patterns; it does not copy third-party content verbatim.",
+    "Generated content is a starting point for human review, not a performance prediction."
+  ]
+};
+
+const HYPOTHESIS_GAP_INDEX = -1;
+
+const HYPOTHESIS_NOTE_INDEX = -1;
+
+function esc(value) {
+  if (value === undefined || value === null) return '';
+  return String(value)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function list(items, mark) {
+  return '<ul>' + (items || []).map(function (item, i) {
+    return '<li' + (mark === i ? ' class="hyp" title="Tests a client hypothesis"' : '') + '>' + esc(item) + '</li>';
+  }).join('') + '</ul>';
+}
+function panel(title, body) {
+  return '<div class="panel"><h2>' + esc(title) + '</h2>' + body + '</div>';
+}
+
+function renderBrand(d) {
+  var gaps = (d.gaps || []).map(function (g, i) {
+    return '<li' + (i === HYPOTHESIS_GAP_INDEX ? ' class="hyp"' : '') + '><b>' + esc(g.gap) + '</b> <span class="tag">' + esc(g.type) + '</span><br>' + esc(g.why_it_matters) + '</li>';
+  }).join('');
+  var patterns = (d.viral_patterns_observed || []).map(function (p) {
+    return '<tr><td><b>' + esc(p.pattern) + '</b><br><span class="tag">' + esc(p.source_reference) + '</span></td><td>' +
+      esc(p.hook_mechanic) + '</td><td>' + esc(p.format) + '</td><td>' + esc(p.funnel_stage) + ' / ' + esc(p.commercial_intent) +
+      '</td><td>' + esc(p.adaptation_opportunity) + '<br><span class="tag">Risk: ' + esc(p.risk_if_overused) + '</span></td></tr>';
+  }).join('');
+  var angles = (d.opportunity_angles || []).map(function (a) {
+    return '<li><b>' + esc(a.angle) + '</b><br>' + esc(a.why) + '</li>';
+  }).join('');
+  return panel('Current positioning', '<p>' + esc(d.current_positioning) + '</p>') +
+    '<div class="grid">' + panel('Strengths', list(d.strengths)) + panel('Gaps', '<ul>' + gaps + '</ul>') + '</div>' +
+    panel('Observed patterns', '<div class="scroll"><table><thead><tr><th>Pattern</th><th>Hook</th><th>Format</th><th>Funnel / intent</th><th>Adaptation</th></tr></thead><tbody>' + patterns + '</tbody></table></div>') +
+    panel('Opportunity angles', '<ul>' + angles + '</ul>') +
+    panel('Confidence notes', '<p>' + esc(d.confidence_notes) + '</p>');
+}
+
+function renderGrowth(d) {
+  var mix = d.content_mix || {};
+  var pillars = (d.content_pillars || []).map(function (p) {
+    return panel(p.pillar, '<p><span class="badge">' + esc(p.purpose) + '</span></p><p>' + esc(p.rationale) + '</p>' + list(p.patterns_to_use));
+  }).join('');
+  var intents = '<div class="bar"><span style="width:' + Number(mix.reach) + '%;background:#6a9fd4"></span><span style="width:' +
+    Number(mix.nurture) + '%;background:#d4a64a"></span><span style="width:' + Number(mix.convert) + '%;background:#4f9a6f"></span></div>' +
+    '<p class="tag">reach ' + esc(mix.reach) + '% · nurture ' + esc(mix.nurture) + '% · convert ' + esc(mix.convert) + '%</p>';
+  var proven = '<p class="tag">market-proven patterns ' + esc(mix.market_proven_patterns) + '% · original experiments ' + esc(mix.original_experiments) + '%</p>';
+  return panel('Positioning statement', '<p>' + esc(d.positioning_statement) + '</p>') +
+    panel('Target audience', '<p>' + esc(d.target_audience) + '</p>') +
+    '<div class="grid">' + pillars + '</div>' +
+    panel('Content mix', intents + proven) +
+    panel('Strategic notes', list(d.strategic_notes, HYPOTHESIS_NOTE_INDEX));
+}
+
+function renderIdeation(d) {
+  var ideas = d.ideas || [];
+  return '<p>' + ideas.length + ' ideas across ' + new Set(ideas.map(function (i) { return i.pillar; })).size + ' pillars.</p><div class="grid">' +
+    ideas.map(function (i) {
+      var s = i.script_outline || {};
+      return panel(i.id + ' · ' + i.format + ' · ' + i.intended_action,
+        '<p class="tag">' + esc(i.pillar) + '</p><p><b>' + esc(i.hook) + '</b></p><p>' + esc(i.concept) + '</p>' +
+        '<ul><li>Opening: ' + esc(s.opening) + '</li><li>Body: ' + esc(s.body) + '</li><li>Turn: ' + esc(s.turn) + '</li><li>CTA: ' + esc(s.cta) + '</li></ul>' +
+        '<p class="tag">Pattern: ' + esc(i.pattern_source) + '</p><p>' + esc(i.why_this_could_work) + '</p>');
+    }).join('') + '</div>';
+}
+
+function renderQa(d) {
+  var reviewed = d.reviewed || [];
+  var sum = d.summary || {};
+  var avg = reviewed.length ? reviewed.reduce(function (a, r) { return a + r.average_score; }, 0) / reviewed.length : 0;
+  var rows = reviewed.map(function (r) {
+    var sc = r.scores || {};
+    return '<tr><td>' + esc(r.id) + '</td><td class="' + esc(r.verdict) + '"><b>' + esc(r.verdict) + '</b></td><td>' + esc(r.average_score) +
+      '</td><td class="tag">' + Object.keys(sc).map(function (k) { return esc(k) + ' ' + esc(sc[k]); }).join(' · ') +
+      '</td><td>' + esc(r.reason) + '<br><span class="tag">Suggestion: ' + esc(r.improvement_suggestion) + '</span></td></tr>';
+  }).join('');
+  return '<div class="panel stats">' +
+    '<div class="stat approved"><b>' + esc(sum.approved) + '</b>approved</div>' +
+    '<div class="stat revise"><b>' + esc(sum.revise) + '</b>revise</div>' +
+    '<div class="stat rejected"><b>' + esc(sum.rejected) + '</b>rejected</div>' +
+    '<div class="stat"><b>' + avg.toFixed(2) + '</b>set average</div></div>' +
+    panel('Reviews (average, verdict and summary recomputed by the engine)',
+      '<div class="scroll"><table><thead><tr><th>Idea</th><th>Verdict</th><th>Avg</th><th>Scores (0-5)</th><th>Reason</th></tr></thead><tbody>' + rows + '</tbody></table></div>');
+}
+
+function renderOrchestrator(d) {
+  var cal = (d.calendar_7_days || []).map(function (c) {
+    return '<tr><td>' + esc(c.day) + '<br><span class="tag">' + esc(c.date_label) + '</span></td><td>' + esc(c.idea_id) + '</td><td>' +
+      esc(c.format) + '</td><td>' + esc(c.pillar) + '</td><td>' + esc(c.intended_action) + '</td><td class="' +
+      (c.status === 'approved' ? 'approved' : 'revise') + '">' + esc(c.status) + '</td></tr>';
+  }).join('');
+  var metrics = (d.metrics_to_track || []).map(function (m) {
+    return '<li><b>' + esc(m.metric) + '</b> — ' + esc(m.why_it_matters) + '<br><span class="tag">Signal: ' + esc(m.target_signal) + '</span></li>';
+  }).join('');
+  var log = d.learning_log_entry || {};
+  return panel('7-day calendar', '<div class="scroll"><table><thead><tr><th>Day</th><th>Idea</th><th>Format</th><th>Pillar</th><th>Intent</th><th>Status</th></tr></thead><tbody>' + cal + '</tbody></table></div>') +
+    panel('Metrics to track', '<ul>' + metrics + '</ul>') +
+    '<div class="grid">' + panel('What worked', list(log.what_worked)) +
+    panel('What was rejected and why', list(log.what_was_rejected_and_why)) +
+    panel('Next run', list(log.next_run_recommendations)) + '</div>' +
+    panel('Honesty notes (added by code)', list(d.honesty_notes));
+}
+
+document.getElementById('view-brand').innerHTML = renderBrand(brandAnalystData);
+document.getElementById('view-growth').innerHTML = renderGrowth(growthStrategistData);
+document.getElementById('view-ideation').innerHTML = renderIdeation(contentIdeationData);
+document.getElementById('view-qa').innerHTML = renderQa(contentQaData);
+document.getElementById('view-orchestrator').innerHTML = renderOrchestrator(orchestratorFinalData);
+
+document.querySelectorAll('nav button').forEach(function (button) {
+  button.addEventListener('click', function () {
+    document.querySelectorAll('nav button').forEach(function (b) {
+      b.setAttribute('aria-selected', String(b === button));
+    });
+    document.querySelectorAll('main section').forEach(function (s) {
+      s.hidden = s.id !== 'view-' + button.dataset.view;
+    });
+  });
+});
+</script>
+</body>
+</html>

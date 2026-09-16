@@ -1,0 +1,66 @@
+{
+  "client": "quillfern",
+  "run_id": "example",
+  "provider": "mock-fixtures",
+  "offline": true,
+  "status": "completed",
+  "started_at": "2026-09-16T18:41:22.665Z",
+  "steps": [
+    {
+      "id": "brand_analyst",
+      "status": "completed",
+      "model": "mock-fixtures (offline)",
+      "attempts": 1,
+      "started_at": "2026-09-16T18:41:22.666Z",
+      "rejected_attempts": [],
+      "adjustments": [],
+      "finished_at": "2026-09-16T18:41:22.667Z"
+    },
+    {
+      "id": "growth_strategist",
+      "status": "completed",
+      "model": "mock-fixtures (offline)",
+      "attempts": 1,
+      "started_at": "2026-09-16T18:41:22.667Z",
+      "rejected_attempts": [],
+      "adjustments": [],
+      "finished_at": "2026-09-16T18:41:22.668Z"
+    },
+    {
+      "id": "content_ideation",
+      "status": "completed",
+      "model": "mock-fixtures (offline)",
+      "attempts": 1,
+      "started_at": "2026-09-16T18:41:22.668Z",
+      "rejected_attempts": [],
+      "adjustments": [],
+      "finished_at": "2026-09-16T18:41:22.669Z"
+    },
+    {
+      "id": "content_qa",
+      "status": "completed",
+      "model": "mock-fixtures (offline)",
+      "attempts": 1,
+      "started_at": "2026-09-16T18:41:22.669Z",
+      "rejected_attempts": [],
+      "adjustments": [],
+      "finished_at": "2026-09-16T18:41:22.670Z"
+    },
+    {
+      "id": "orchestrator",
+      "status": "completed",
+      "model": "mock-fixtures (offline)",
+      "attempts": 1,
+      "started_at": "2026-09-16T18:41:22.670Z",
+      "rejected_attempts": [],
+      "adjustments": [],
+      "finished_at": "2026-09-16T18:41:22.671Z"
+    }
+  ],
+  "usage_total": {
+    "calls": 5,
+    "input_tokens": 0,
+    "output_tokens": 0
+  },
+  "completed_at": "2026-09-16T18:41:22.671Z"
+}

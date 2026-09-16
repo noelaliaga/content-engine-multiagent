@@ -1,0 +1,202 @@
+# content-engine-multiagent
+
+A five-step LLM pipeline that turns a hand-curated brand brief into a content strategy:
+brand analysis → growth strategy → content ideas → scored QA review → a 7-day calendar.
+Each step is a separate model call with its own prompt and **its own JSON Schema contract**, and
+the engine, not the model, decides what counts as a valid hand-off between steps.
+
+The repository ships a **fictional client** (Quillfern Plant Co., a made-up houseplant brand) and an
+**offline provider**, so everything below runs without an API key, a network connection or cost.
+
+## The problem
+
+Chaining LLM calls is easy. Making a chain whose output you can trust is not:
+
+- a step returns prose around its JSON, or JSON with the wrong shape, and the next step builds on it;
+- a later step invents things the earlier steps never produced (a pillar nobody defined, an idea id that does not exist);
+- the model does arithmetic it was told to do (averages, verdicts, counts) and gets it wrong;
+- a failure halfway through leaves you with half an output and no record of why.
+
+This engine treats every model response as untrusted input and puts a validator between each step.
+
+## Architecture
+
+```mermaid
+flowchart LR
+  subgraph client["clients/&lt;slug&gt;/ (curated input)"]
+    RC[run_context.json]
+    CC[competitor_context.json]
+    CX[context.md]
+    LL[learning_log.md]
+  end
+  KB[(engine/kb<br/>knowledge base)]
+
+  RC -->|validated against<br/>input schema| A1
+  CC --> A1
+  CX --> A1
+  LL --> A1
+  KB -.-> A1 & A2 & A3 & A4
+
+  A1["1 · Brand Analyst"] -->|brand_analysis| A2["2 · Growth Strategist"]
+  A2 -->|growth_strategy| A3["3 · Content Ideation"]
+  A1 -->|brand_analysis| A3
+  A3 -->|content_ideas| A4["4 · Content QA"]
+  A2 -->|growth_strategy| A4
+  A3 -->|content_ideas| A5["5 · Orchestrator"]
+  A4 -->|qa_review| A5
+  A2 -->|growth_strategy| A5
+  A5 -->|learning_log_entry<br/>live runs only| LL
+  A5 --> OUT[05_orchestrator.json<br/>+ dashboard.html]
+```
+
+Every arrow between agents passes through the same gate:
+
+```mermaid
+flowchart LR
+  P[provider.complete] --> J{JSON.parse}
+  J -->|fail| R[retry with validator errors]
+  J --> S{Ajv: step JSON Schema}
+  S -->|fail| R
+  S --> I{cross-step invariants}
+  I -->|fail| R
+  R -->|attempts left| P
+  R -->|budget exhausted| E[StepFailedError<br/>state.json = failed, ERROR.json]
+  I --> N[deterministic normalisation] --> W[write output, next step]
+```
+
+### Contracts between steps
+
+| Step | Receives | Returns (schema in `engine/schemas/`) | Checked by code beyond the schema |
+|---|---|---|---|
+| 1 Brand Analyst | `run_context`, `competitor_context`, `context_notes`, `learning_log` | positioning, strengths, typed `gaps`, `viral_patterns_observed` (funnel stage, intent…), `opportunity_angles`, `confidence_notes` | — |
+| 2 Growth Strategist | `run_context`, `brand_analysis` | `content_pillars` (purpose ∈ reach/nurture/convert), `content_mix`, notes | both mixes add up to 100; unique, non-empty pillars |
+| 3 Content Ideation | `run_context`, `growth_strategy`, `brand_analysis` | `ideas[]` with id, pillar, format enum, hook, script outline, intent, pattern source | unique ids; every idea uses an existing pillar; every pillar has an idea |
+| 4 Content QA | `content_ideas`, `growth_strategy`, `run_context` | `reviewed[]` with seven integer scores, reason, suggestion; `summary` | reviews exactly the generated ids; scores are integers 0–5 |
+| 5 Orchestrator | `run_context`, `growth_strategy`, `content_ideas`, `qa_review` | `calendar_7_days`, `metrics_to_track`, `learning_log_entry` | exactly 7 days; only known ids; never a rejected idea; `revise` ideas only when fewer than 7 are approved |
+
+The client input (`run_context.json`) is validated too, before the first model call, so a broken brief
+fails fast and costs nothing.
+
+## Design decisions
+
+**JSON Schema between agents.** The schema is the interface. It is sent to the provider as a strict
+structured-output constraint *and* included in the system prompt (for providers that ignore
+`response_format`), and the response is still validated locally with Ajv in strict mode. Provider-side
+structured output reduces bad responses; local validation is what guarantees them. Strict parsing is
+deliberate: no fence stripping, no JSON repair. A response wrapped in Markdown is a rejected attempt.
+
+**Containing hallucinations.** A schema cannot say "this pillar must be one the previous step defined".
+`src/invariants.js` does: it cross-checks ids, pillar names, mix totals and calendar choices against the
+earlier validated outputs. A violation is fed back to the model as a list of concrete errors
+(`idea "idea_03" uses unknown pillar "…"`), and the step gets one retry by default (`maxAttempts: 2`).
+If the retry fails, the run stops. Nothing is fabricated for the failed step, and `ERROR.json` records
+every rejected attempt.
+
+**The model scores; the engine decides.** QA returns seven integer scores per idea. The average, the
+verdict (≥ 4 approved, ≥ 2.5 revise, otherwise rejected) and the summary counts are recomputed by code
+(`src/normalize.js`). Calendar entries copy `format`, `pillar`, `intended_action` and `status` from the
+referenced idea and its verdict. Every override is logged in `state.json` as an `adjustment`, so you can
+see how often the model got it wrong. The honesty notes in the final output are constants in code,
+never generated.
+
+**Provider errors are not retried.** HTTP errors, refusals and `finish_reason: length` (truncation) raise
+`ProviderError` right away. Retrying a truncated response with the same `max_tokens` would just waste
+money. The error message points to the per-step `max_tokens` setting instead.
+
+**Offline and live runs never mix.** Offline runs are written to `<run_id>__mock/` and never touch the
+client's learning log. Only live runs append to it, and the next run feeds it to the Brand Analyst.
+
+**Cost.** One model call per step: five calls for a clean run, at most `5 × maxAttempts` in the worst case.
+The knowledge base goes only to the four steps that use it. Prompt and completion tokens are summed in
+`state.json` (`usage_total`). The engine does not convert tokens to money, because prices depend on the
+model you configure. Models and `max_tokens` are set per step in `engine/config/models.json`, and
+`CONTENT_ENGINE_MODEL` overrides all of them. For example, you can run a cheaper model first and switch
+only the Brand Analyst to a stronger one.
+
+**Small surface.** One runtime dependency (Ajv). The live provider talks to OpenRouter's
+OpenAI-compatible Chat Completions endpoint with plain `fetch`; `OPENROUTER_BASE_URL` points it at
+another compatible endpoint. The code is plain ES modules type-checked with `tsc --checkJs --strict`.
+
+## Repository layout
+
+```
+bin/                 CLIs: run-pipeline, new-client, build-dashboard
+src/                 pipeline runner, step definitions, validation, invariants, normalisation, providers
+engine/agents/       one system prompt per step (Markdown)
+engine/schemas/      output contract per step + input schema for run_context.json
+engine/kb/           generic knowledge base (hooks, content patterns, diagnostic protocols, a fictional exemplar)
+engine/fixtures/     synthetic responses used by the offline provider and the tests
+engine/config/       per-step model configuration
+engine/dashboard/    self-contained HTML run viewer template
+clients/_template/   scaffold copied by new-client
+clients/quillfern/   the fictional sample client
+examples/            a committed offline run (synthetic) with its dashboard
+tests/               node:test suite (scripted provider, mocked HTTP)
+```
+
+## How to run it
+
+Requires Node.js 22 or newer.
+
+```bash
+npm ci
+
+# Offline demo: synthetic fixtures, no key, no network, no cost
+npm run demo                 # writes .demo-runs/demo__mock/ and dashboard.html
+
+# Quality gates (the same ones CI runs)
+npm run lint                 # Biome
+npm run typecheck            # tsc --checkJs --strict
+npm test                     # node:test
+npm run check                # all of the above + the demo
+
+# Your own client
+npm run new-client -- acme-widgets          # scaffolds clients/acme-widgets/
+# edit context.md, run_context.json, competitor_context.json, then:
+node bin/run-pipeline.js acme-widgets       # offline, uses the Quillfern fixtures
+```
+
+Note that offline mode always replays the Quillfern fixtures. For a client of your own, only a live run
+produces content about that client.
+
+### Live mode (your own key, real cost)
+
+```bash
+cp .env.example .env         # then set OPENROUTER_API_KEY in .env
+node bin/run-pipeline.js quillfern --live
+# optional: CONTENT_ENGINE_MODEL=<openrouter model id> to use one model for every step
+```
+
+`.env.example` lists variable names only. `.env` is git-ignored. Model ids in
+`engine/config/models.json` are OpenRouter ids; check that they are still available and priced as you
+expect before a live run.
+
+## Status (honest)
+
+| What | State |
+|---|---|
+| Orchestration, retries, schema validation, invariants, normalisation, error paths, `new-client`, dashboard, CLI | **Tested locally**: 38 `node:test` tests with a scripted provider. CI workflow for Node 22 and 24 is included |
+| Live provider request/response handling (body shape, auth header, HTTP errors, truncation, refusals) | **Tested against a mocked `fetch`** only |
+| Live runs against real models with *this* code | **Not included and not executed.** Run `node bin/run-pipeline.js <client> --live` with your own key |
+| Real-world use | An earlier private version of this pipeline (same five steps and output schemas, with Spanish enum labels in one field; different runner code) **ran end-to-end once on a real brief in July 2026**: 5/5 steps in about seven minutes, after a first attempt failed on output truncation. That brief and its outputs are private and not published. This repo is a rewrite that ships a synthetic client |
+| Output quality | Not measured. No evaluation set, no human rating, no performance data from published content |
+
+## Limits
+
+- **Inputs are manual.** There is no connection to any social network. The brief is curated by hand, and the analysis is only as good as that brief.
+- **No quality evaluation.** The invariants catch structural and referential errors, not bland or wrong ideas. The QA step is itself an LLM, and the one real run approved every idea, which suggests the scoring is lenient. The thresholds are a policy, not a calibrated measure.
+- **The learning log is memory by prompt.** It is appended text sent back as context, not training.
+- **Sequential and synchronous.** No parallelism, streaming, caching or resumption of a failed run from the failed step.
+- **One provider implementation.** OpenRouter or another OpenAI-compatible endpoint. Other APIs need a new provider (the interface is `src/types.js` → `LlmProvider`).
+- **The prompts are English.** The original was used in Spanish; output language follows the brief and the prompts.
+- **Retry feedback includes the rejected response** (truncated to 4,000 characters), which adds tokens on retries.
+
+## Credits
+
+- [Ajv](https://ajv.js.org/) for JSON Schema validation; [Biome](https://biomejs.dev/) for lint and format; [TypeScript](https://www.typescriptlang.org/) for type checking of the JSDoc-annotated JavaScript.
+- [OpenRouter](https://openrouter.ai/) Chat Completions API with structured outputs (live mode).
+- Marketing concepts in `engine/kb/` (TOFU/MOFU/BOFU, hook types, social proof…) are common industry vocabulary, rewritten here in general terms.
+
+## License
+
+MIT, see [LICENSE](LICENSE). The sample brand, its data and all fixtures are fictional.

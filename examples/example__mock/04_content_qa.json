@@ -1,0 +1,137 @@
+{
+  "reviewed": [
+    {
+      "id": "idea_01",
+      "scores": {
+        "on_brand": 5,
+        "hook_strength": 5,
+        "pillar_fit": 5,
+        "offer_connection": 3,
+        "feasibility": 4,
+        "originality": 4,
+        "claim_safety": 5
+      },
+      "average_score": 4.43,
+      "verdict": "approved",
+      "reason": "Hook and pillar fit are 5; offer connection is 3 because the checklist is one step away from the subscription.",
+      "improvement_suggestion": "Mention in the checklist DM that the kit includes the same routine."
+    },
+    {
+      "id": "idea_02",
+      "scores": {
+        "on_brand": 4,
+        "hook_strength": 4,
+        "pillar_fit": 5,
+        "offer_connection": 3,
+        "feasibility": 5,
+        "originality": 3,
+        "claim_safety": 5
+      },
+      "average_score": 4.14,
+      "verdict": "approved",
+      "reason": "Strong pillar fit and feasibility (5); originality is 3 because open-loop rescues are common.",
+      "improvement_suggestion": "Pin the answer comment to keep the loop tidy."
+    },
+    {
+      "id": "idea_03",
+      "scores": {
+        "on_brand": 5,
+        "hook_strength": 4,
+        "pillar_fit": 5,
+        "offer_connection": 4,
+        "feasibility": 4,
+        "originality": 4,
+        "claim_safety": 5
+      },
+      "average_score": 4.43,
+      "verdict": "approved",
+      "reason": "On-brand and pillar fit are 5; addresses the churn-prone month directly.",
+      "improvement_suggestion": "Add a final slide pointing to the plant-care chat."
+    },
+    {
+      "id": "idea_04",
+      "scores": {
+        "on_brand": 4,
+        "hook_strength": 3,
+        "pillar_fit": 5,
+        "offer_connection": 4,
+        "feasibility": 5,
+        "originality": 3,
+        "claim_safety": 5
+      },
+      "average_score": 4.14,
+      "verdict": "approved",
+      "reason": "Pillar fit and feasibility are 5; hook strength is 3, acceptable for an email.",
+      "improvement_suggestion": "Test a subject line that names the plant type."
+    },
+    {
+      "id": "idea_05",
+      "scores": {
+        "on_brand": 5,
+        "hook_strength": 4,
+        "pillar_fit": 5,
+        "offer_connection": 5,
+        "feasibility": 3,
+        "originality": 4,
+        "claim_safety": 5
+      },
+      "average_score": 4.43,
+      "verdict": "approved",
+      "reason": "Offer connection is 5; feasibility is 3 because it needs a consenting subscriber.",
+      "improvement_suggestion": "Confirm written consent before scheduling."
+    },
+    {
+      "id": "idea_06",
+      "scores": {
+        "on_brand": 4,
+        "hook_strength": 4,
+        "pillar_fit": 4,
+        "offer_connection": 5,
+        "feasibility": 4,
+        "originality": 3,
+        "claim_safety": 5
+      },
+      "average_score": 4.14,
+      "verdict": "approved",
+      "reason": "Offer connection is 5; originality is 3 because before/after carousels are common.",
+      "improvement_suggestion": "Use the subscribers' own words on each slide."
+    },
+    {
+      "id": "idea_07",
+      "scores": {
+        "on_brand": 4,
+        "hook_strength": 3,
+        "pillar_fit": 4,
+        "offer_connection": 3,
+        "feasibility": 4,
+        "originality": 3,
+        "claim_safety": 5
+      },
+      "average_score": 3.71,
+      "verdict": "revise",
+      "reason": "Hook strength and offer connection are 3; depends on weekly live availability.",
+      "improvement_suggestion": "Pre-collect submissions so the story can be batched."
+    },
+    {
+      "id": "idea_08",
+      "scores": {
+        "on_brand": 2,
+        "hook_strength": 4,
+        "pillar_fit": 2,
+        "offer_connection": 3,
+        "feasibility": 4,
+        "originality": 2,
+        "claim_safety": 0
+      },
+      "average_score": 2.43,
+      "verdict": "rejected",
+      "reason": "claim_safety is 0: 'never dies, guaranteed' violates the no-guaranteed-results constraint; on-brand is 2.",
+      "improvement_suggestion": "Replace the guarantee with the real promise: help from the plant-care chat when something goes wrong."
+    }
+  ],
+  "summary": {
+    "approved": 6,
+    "revise": 1,
+    "rejected": 1
+  }
+}
