@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{BRAND_NAME}} · run {{RUN_ID}} · content engine</title>
+<!-- Self-contained run viewer: no external fonts, scripts or requests. Data is injected by src/dashboard.js. -->
+<style>
+  :root {
+    --bg: #f6f5f1; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6a64; --line: #e3e1da;
+    --accent: #2f6f4f; --ok: #2f7d4f; --warn: #a86b00; --bad: #b3372b; --chip: #efede6;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #151614; --panel: #1f201d; --ink: #ecebe6; --muted: #a09f98; --line: #34352f; --chip: #2a2b27; --accent: #6fbf94; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-size: 14px; line-height: 1.5; }
+  header { padding: 20px 24px 12px; border-bottom: 1px solid var(--line); }
+  header h1 { margin: 0; font-size: 20px; }
+  header p { margin: 4px 0 0; color: var(--muted); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; background: var(--chip); font-size: 12px; margin-right: 6px; }
+  .badge.mode { background: var(--accent); color: #fff; }
+  nav { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 24px; border-bottom: 1px solid var(--line); }
+  nav button { border: 1px solid var(--line); background: var(--panel); color: var(--ink); padding: 8px 12px; border-radius: 8px; cursor: pointer; font: inherit; }
+  nav button[aria-selected="true"] { border-color: var(--accent); box-shadow: inset 0 -2px 0 var(--accent); }
+  main { padding: 20px 24px 40px; max-width: 1100px; }
+  section[hidden] { display: none; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; }
+  .panel h2 { margin: 0 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  ul { margin: 0; padding-left: 18px; }
+  li { margin: 4px 0; }
+  .tag { font-size: 12px; color: var(--muted); }
+  .hyp { border-left: 3px solid var(--warn); padding-left: 8px; }
+  .stats { display: flex; flex-wrap: wrap; gap: 12px; }
+  .stat { flex: 1 1 120px; text-align: center; }
+  .stat b { display: block; font-size: 26px; }
+  .approved { color: var(--ok); } .revise { color: var(--warn); } .rejected { color: var(--bad); }
+  .bar { display: flex; height: 12px; border-radius: 6px; overflow: hidden; background: var(--chip); margin: 6px 0; }
+  .bar span { display: block; height: 100%; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .scroll { overflow-x: auto; }
+  footer { color: var(--muted); font-size: 12px; padding: 0 24px 24px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>{{BRAND_NAME}} <span class="tag">{{HANDLE}}</span></h1>
+  <p><span class="badge mode">{{RUN_MODE_LABEL}}</span><span class="badge">run {{RUN_ID}}</span><span class="badge">5 steps</span></p>
+</header>
+<nav role="tablist">
+  <button role="tab" data-view="brand" aria-selected="true">01 Brand Analyst</button>
+  <button role="tab" data-view="growth" aria-selected="false">02 Growth Strategist</button>
+  <button role="tab" data-view="ideation" aria-selected="false">03 Content Ideation</button>
+  <button role="tab" data-view="qa" aria-selected="false">04 Content QA</button>
+  <button role="tab" data-view="orchestrator" aria-selected="false">05 Orchestrator</button>
+</nav>
+<main>
+  <section id="view-brand"></section>
+  <section id="view-growth" hidden></section>
+  <section id="view-ideation" hidden></section>
+  <section id="view-qa" hidden></section>
+  <section id="view-orchestrator" hidden></section>
+</main>
+<footer>Generated from the run's JSON outputs. Content is a starting point for human review, not a performance prediction.</footer>
+<script>
+/*__RUN_DATA__*/
+
+function esc(value) {
+  if (value === undefined || value === null) return '';
+  return String(value)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function list(items, mark) {
+  return '<ul>' + (items || []).map(function (item, i) {
+    return '<li' + (mark === i ? ' class="hyp" title="Tests a client hypothesis"' : '') + '>' + esc(item) + '</li>';
+  }).join('') + '</ul>';
+}
+function panel(title, body) {
+  return '<div class="panel"><h2>' + esc(title) + '</h2>' + body + '</div>';
+}
+
+function renderBrand(d) {
+  var gaps = (d.gaps || []).map(function (g, i) {
+    return '<li' + (i === HYPOTHESIS_GAP_INDEX ? ' class="hyp"' : '') + '><b>' + esc(g.gap) + '</b> <span class="tag">' + esc(g.type) + '</span><br>' + esc(g.why_it_matters) + '</li>';
+  }).join('');
+  var patterns = (d.viral_patterns_observed || []).map(function (p) {
+    return '<tr><td><b>' + esc(p.pattern) + '</b><br><span class="tag">' + esc(p.source_reference) + '</span></td><td>' +
+      esc(p.hook_mechanic) + '</td><td>' + esc(p.format) + '</td><td>' + esc(p.funnel_stage) + ' / ' + esc(p.commercial_intent) +
+      '</td><td>' + esc(p.adaptation_opportunity) + '<br><span class="tag">Risk: ' + esc(p.risk_if_overused) + '</span></td></tr>';
+  }).join('');
+  var angles = (d.opportunity_angles || []).map(function (a) {
+    return '<li><b>' + esc(a.angle) + '</b><br>' + esc(a.why) + '</li>';
+  }).join('');
+  return panel('Current positioning', '<p>' + esc(d.current_positioning) + '</p>') +
+    '<div class="grid">' + panel('Strengths', list(d.strengths)) + panel('Gaps', '<ul>' + gaps + '</ul>') + '</div>' +
+    panel('Observed patterns', '<div class="scroll"><table><thead><tr><th>Pattern</th><th>Hook</th><th>Format</th><th>Funnel / intent</th><th>Adaptation</th></tr></thead><tbody>' + patterns + '</tbody></table></div>') +
+    panel('Opportunity angles', '<ul>' + angles + '</ul>') +
+    panel('Confidence notes', '<p>' + esc(d.confidence_notes) + '</p>');
+}
+
+function renderGrowth(d) {
+  var mix = d.content_mix || {};
+  var pillars = (d.content_pillars || []).map(function (p) {
+    return panel(p.pillar, '<p><span class="badge">' + esc(p.purpose) + '</span></p><p>' + esc(p.rationale) + '</p>' + list(p.patterns_to_use));
+  }).join('');
+  var intents = '<div class="bar"><span style="width:' + Number(mix.reach) + '%;background:#6a9fd4"></span><span style="width:' +
+    Number(mix.nurture) + '%;background:#d4a64a"></span><span style="width:' + Number(mix.convert) + '%;background:#4f9a6f"></span></div>' +
+    '<p class="tag">reach ' + esc(mix.reach) + '% · nurture ' + esc(mix.nurture) + '% · convert ' + esc(mix.convert) + '%</p>';
+  var proven = '<p class="tag">market-proven patterns ' + esc(mix.market_proven_patterns) + '% · original experiments ' + esc(mix.original_experiments) + '%</p>';
+  return panel('Positioning statement', '<p>' + esc(d.positioning_statement) + '</p>') +
+    panel('Target audience', '<p>' + esc(d.target_audience) + '</p>') +
+    '<div class="grid">' + pillars + '</div>' +
+    panel('Content mix', intents + proven) +
+    panel('Strategic notes', list(d.strategic_notes, HYPOTHESIS_NOTE_INDEX));
+}
+
+function renderIdeation(d) {
+  var ideas = d.ideas || [];
+  return '<p>' + ideas.length + ' ideas across ' + new Set(ideas.map(function (i) { return i.pillar; })).size + ' pillars.</p><div class="grid">' +
+    ideas.map(function (i) {
+      var s = i.script_outline || {};
+      return panel(i.id + ' · ' + i.format + ' · ' + i.intended_action,
+        '<p class="tag">' + esc(i.pillar) + '</p><p><b>' + esc(i.hook) + '</b></p><p>' + esc(i.concept) + '</p>' +
+        '<ul><li>Opening: ' + esc(s.opening) + '</li><li>Body: ' + esc(s.body) + '</li><li>Turn: ' + esc(s.turn) + '</li><li>CTA: ' + esc(s.cta) + '</li></ul>' +
+        '<p class="tag">Pattern: ' + esc(i.pattern_source) + '</p><p>' + esc(i.why_this_could_work) + '</p>');
+    }).join('') + '</div>';
+}
+
+function renderQa(d) {
+  var reviewed = d.reviewed || [];
+  var sum = d.summary || {};
+  var avg = reviewed.length ? reviewed.reduce(function (a, r) { return a + r.average_score; }, 0) / reviewed.length : 0;
+  var rows = reviewed.map(function (r) {
+    var sc = r.scores || {};
+    return '<tr><td>' + esc(r.id) + '</td><td class="' + esc(r.verdict) + '"><b>' + esc(r.verdict) + '</b></td><td>' + esc(r.average_score) +
+      '</td><td class="tag">' + Object.keys(sc).map(function (k) { return esc(k) + ' ' + esc(sc[k]); }).join(' · ') +
+      '</td><td>' + esc(r.reason) + '<br><span class="tag">Suggestion: ' + esc(r.improvement_suggestion) + '</span></td></tr>';
+  }).join('');
+  return '<div class="panel stats">' +
+    '<div class="stat approved"><b>' + esc(sum.approved) + '</b>approved</div>' +
+    '<div class="stat revise"><b>' + esc(sum.revise) + '</b>revise</div>' +
+    '<div class="stat rejected"><b>' + esc(sum.rejected) + '</b>rejected</div>' +
+    '<div class="stat"><b>' + avg.toFixed(2) + '</b>set average</div></div>' +
+    panel('Reviews (average, verdict and summary recomputed by the engine)',
+      '<div class="scroll"><table><thead><tr><th>Idea</th><th>Verdict</th><th>Avg</th><th>Scores (0-5)</th><th>Reason</th></tr></thead><tbody>' + rows + '</tbody></table></div>');
+}
+
+function renderOrchestrator(d) {
+  var cal = (d.calendar_7_days || []).map(function (c) {
+    return '<tr><td>' + esc(c.day) + '<br><span class="tag">' + esc(c.date_label) + '</span></td><td>' + esc(c.idea_id) + '</td><td>' +
+      esc(c.format) + '</td><td>' + esc(c.pillar) + '</td><td>' + esc(c.intended_action) + '</td><td class="' +
+      (c.status === 'approved' ? 'approved' : 'revise') + '">' + esc(c.status) + '</td></tr>';
+  }).join('');
+  var metrics = (d.metrics_to_track || []).map(function (m) {
+    return '<li><b>' + esc(m.metric) + '</b> — ' + esc(m.why_it_matters) + '<br><span class="tag">Signal: ' + esc(m.target_signal) + '</span></li>';
+  }).join('');
+  var log = d.learning_log_entry || {};
+  return panel('7-day calendar', '<div class="scroll"><table><thead><tr><th>Day</th><th>Idea</th><th>Format</th><th>Pillar</th><th>Intent</th><th>Status</th></tr></thead><tbody>' + cal + '</tbody></table></div>') +
+    panel('Metrics to track', '<ul>' + metrics + '</ul>') +
+    '<div class="grid">' + panel('What worked', list(log.what_worked)) +
+    panel('What was rejected and why', list(log.what_was_rejected_and_why)) +
+    panel('Next run', list(log.next_run_recommendations)) + '</div>' +
+    panel('Honesty notes (added by code)', list(d.honesty_notes));
+}
+
+document.getElementById('view-brand').innerHTML = renderBrand(brandAnalystData);
+document.getElementById('view-growth').innerHTML = renderGrowth(growthStrategistData);
+document.getElementById('view-ideation').innerHTML = renderIdeation(contentIdeationData);
+document.getElementById('view-qa').innerHTML = renderQa(contentQaData);
+document.getElementById('view-orchestrator').innerHTML = renderOrchestrator(orchestratorFinalData);
+
+document.querySelectorAll('nav button').forEach(function (button) {
+  button.addEventListener('click', function () {
+    document.querySelectorAll('nav button').forEach(function (b) {
+      b.setAttribute('aria-selected', String(b === button));
+    });
+    document.querySelectorAll('main section').forEach(function (s) {
+      s.hidden = s.id !== 'view-' + button.dataset.view;
+    });
+  });
+});
+</script>
+</body>
+</html>
