@@ -23,7 +23,7 @@ This engine treats every model response as untrusted input and puts a validator 
 
 ```mermaid
 flowchart LR
-  subgraph client["clients/&lt;slug&gt;/ (curated input)"]
+  subgraph client["clients/{slug}/ (curated input)"]
     RC[run_context.json]
     CC[competitor_context.json]
     CX[context.md]
@@ -70,9 +70,12 @@ flowchart LR
 |---|---|---|---|
 | 1 Brand Analyst | `run_context`, `competitor_context`, `context_notes`, `learning_log` | positioning, strengths, typed `gaps`, `viral_patterns_observed` (funnel stage, intent…), `opportunity_angles`, `confidence_notes` | — |
 | 2 Growth Strategist | `run_context`, `brand_analysis` | `content_pillars` (purpose ∈ reach/nurture/convert), `content_mix`, notes | both mixes add up to 100; unique, non-empty pillars |
-| 3 Content Ideation | `run_context`, `growth_strategy`, `brand_analysis` | `ideas[]` with id, pillar, format enum, hook, script outline, intent, pattern source | unique ids; every idea uses an existing pillar; every pillar has an idea |
-| 4 Content QA | `content_ideas`, `growth_strategy`, `run_context` | `reviewed[]` with seven integer scores, reason, suggestion; `summary` | reviews exactly the generated ids; scores are integers 0–5 |
-| 5 Orchestrator | `run_context`, `growth_strategy`, `content_ideas`, `qa_review` | `calendar_7_days`, `metrics_to_track`, `learning_log_entry` | exactly 7 days; only known ids; never a rejected idea; `revise` ideas only when fewer than 7 are approved |
+| 3 Content Ideation | `run_context`, `growth_strategy`, `brand_analysis`, `min_ideas` | `ideas[]` with id, pillar, format enum, hook, script outline, intent, pattern source | at least 8 ideas; unique ids; every idea uses an existing pillar; every pillar has an idea |
+| 4 Content QA | `content_ideas`, `growth_strategy`, `run_context` | `reviewed[]` with seven integer scores, reason, suggestion; `summary` | reviews exactly the generated ids; scores are integers 0–5; `claim_safety` ≤ 1 always rejects |
+| 5 Orchestrator | `run_context`, `growth_strategy`, `content_ideas`, `qa_review` | `calendar_7_days`, `metrics_to_track`, `learning_log_entry` | not called if QA rejected everything; exactly 7 days; only known ids; never a rejected idea; `revise` ideas only when fewer than 7 are approved; repeats only when fewer than 7 ideas are schedulable |
+
+Every rule in the last column has a test that breaks it on purpose (`tests/invariants.test.js`,
+`tests/pipeline.test.js`).
 
 The client input (`run_context.json`) is validated too, before the first model call, so a broken brief
 fails fast and costs nothing.
@@ -94,10 +97,18 @@ every rejected attempt.
 
 **The model scores; the engine decides.** QA returns seven integer scores per idea. The average, the
 verdict (≥ 4 approved, ≥ 2.5 revise, otherwise rejected) and the summary counts are recomputed by code
-(`src/normalize.js`). Calendar entries copy `format`, `pillar`, `intended_action` and `status` from the
-referenced idea and its verdict. Every override is logged in `state.json` as an `adjustment`, so you can
-see how often the model got it wrong. The honesty notes in the final output are constants in code,
-never generated.
+(`src/normalize.js`). One rule sits above the average: a `claim_safety` score of 0 or 1 (a guaranteed
+result, an income figure) rejects the idea whatever its other scores are, so a strong hook cannot carry
+an unsafe claim into the calendar. Calendar entries copy `format`, `pillar`, `intended_action` and
+`status` from the referenced idea and its verdict, and the learning-log `run_id` comes from the CLI.
+Each of these overrides is logged in `state.json` as an `adjustment` when it changes what the model
+returned, so you can see how often the model got it wrong. The honesty notes in the final output are
+constants in code, never generated.
+
+**A contract the model can actually satisfy.** The calendar needs seven ideas that QA did not reject.
+Ideation therefore has to return at least eight ideas. If QA still leaves fewer than seven, the
+orchestrator may repeat ideas (and only then). If QA rejects everything, the run stops with
+`StepBlockedError` *before* the orchestrator call, instead of paying for a call that cannot succeed.
 
 **Provider errors are not retried.** HTTP errors, refusals and `finish_reason: length` (truncation) raise
 `ProviderError` right away. Retrying a truncated response with the same `max_tokens` would just waste
@@ -115,7 +126,10 @@ only the Brand Analyst to a stronger one.
 
 **Small surface.** One runtime dependency (Ajv). The live provider talks to OpenRouter's
 OpenAI-compatible Chat Completions endpoint with plain `fetch`; `OPENROUTER_BASE_URL` points it at
-another compatible endpoint. The code is plain ES modules type-checked with `tsc --checkJs --strict`.
+another compatible endpoint. The API key is redacted from provider error text before it can reach an
+error message, `state.json` or `ERROR.json`. The code is plain ES modules type-checked with
+`tsc --checkJs --strict`. Step definitions are typed per contract (`src/steps.js`): the only cast from
+validated JSON to a contract type is in one function, right after Ajv has checked the schema.
 
 ## Repository layout
 
@@ -131,7 +145,7 @@ engine/dashboard/    self-contained HTML run viewer template
 clients/_template/   scaffold copied by new-client
 clients/quillfern/   the fictional sample client
 examples/            a committed offline run (synthetic) with its dashboard
-tests/               node:test suite (scripted provider, mocked HTTP)
+tests/               node:test suite; tests/support/ holds the scripted test provider
 ```
 
 ## How to run it
@@ -151,7 +165,7 @@ npm test                     # node:test
 npm run check                # all of the above + the demo
 
 # Your own client
-npm run new-client -- acme-widgets          # scaffolds clients/acme-widgets/
+npm run new-client -- acme-widgets          # scaffolds clients/acme-widgets/ (tests ignore local clients)
 # edit context.md, run_context.json, competitor_context.json, then:
 node bin/run-pipeline.js acme-widgets       # offline, uses the Quillfern fixtures
 ```
@@ -175,20 +189,21 @@ expect before a live run.
 
 | What | State |
 |---|---|
-| Orchestration, retries, schema validation, invariants, normalisation, error paths, `new-client`, dashboard, CLI | **Tested locally**: 38 `node:test` tests with a scripted provider. CI workflow for Node 22 and 24 is included |
+| Orchestration, retries, schema validation, invariants, normalisation, error paths, `new-client`, dashboard (including the template's HTML escaping, run in `node:vm`), CLI | **Tested locally on Node 26**: 60 `node:test` tests with a scripted provider. A CI workflow for Node 22 and 24 is included but **has not run on GitHub Actions yet** |
 | Live provider request/response handling (body shape, auth header, HTTP errors, truncation, refusals) | **Tested against a mocked `fetch`** only |
 | Live runs against real models with *this* code | **Not included and not executed.** Run `node bin/run-pipeline.js <client> --live` with your own key |
-| Real-world use | An earlier private version of this pipeline (same five steps and output schemas, with Spanish enum labels in one field; different runner code) **ran end-to-end once on a real brief in July 2026**: 5/5 steps in about seven minutes, after a first attempt failed on output truncation. That brief and its outputs are private and not published. This repo is a rewrite that ships a synthetic client |
+| Real-world use | A private prototype with a similar five-step design (different runner code, Spanish prompts, no local schema validation) was run end-to-end once on a real brief (n=1, no cost or token record kept). Its first attempt failed on output truncation, which is why truncation is a non-retried provider error here. That brief and its outputs are private and not published. This repo is a rewrite that ships a synthetic client |
 | Output quality | Not measured. No evaluation set, no human rating, no performance data from published content |
 
 ## Limits
 
 - **Inputs are manual.** There is no connection to any social network. The brief is curated by hand, and the analysis is only as good as that brief.
-- **No quality evaluation.** The invariants catch structural and referential errors, not bland or wrong ideas. The QA step is itself an LLM, and the one real run approved every idea, which suggests the scoring is lenient. The thresholds are a policy, not a calibrated measure.
+- **No quality evaluation.** The invariants catch structural and referential errors, not bland or wrong ideas. The QA step is itself an LLM and may well be lenient; nothing here measures that. The thresholds and the claim-safety rule are a policy, not a calibrated measure, and the rule is only as good as the `claim_safety` score the model gives.
 - **The learning log is memory by prompt.** It is appended text sent back as context, not training.
 - **Sequential and synchronous.** No parallelism, streaming, caching or resumption of a failed run from the failed step.
 - **One provider implementation.** OpenRouter or another OpenAI-compatible endpoint. Other APIs need a new provider (the interface is `src/types.js` → `LlmProvider`).
 - **The prompts are English.** The original was used in Spanish; output language follows the brief and the prompts.
+- **Model settings are unverified.** The model id in `engine/config/models.json` and the combination of strict `json_schema` output with `reasoning.effort` have not been checked against OpenRouter with this code; support depends on the model and the upstream provider. With some providers reasoning tokens count against `max_tokens`, which makes truncation more likely.
 - **Retry feedback includes the rejected response** (truncated to 4,000 characters), which adds tokens on retries.
 
 ## Credits
