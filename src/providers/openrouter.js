@@ -80,6 +80,16 @@ export function parseChatCompletion(raw, stepId) {
 }
 
 /**
+ * Removes the API key from text that may end up in error messages, state.json or ERROR.json
+ * (for example an error body echoed back by an OpenAI-compatible proxy).
+ * @param {string} text
+ * @param {string} apiKey
+ */
+export function redactSecret(text, apiKey) {
+  return apiKey ? text.split(apiKey).join('[REDACTED]') : text;
+}
+
+/**
  * @typedef {object} OpenRouterOptions
  * @property {string} apiKey
  * @property {string} [baseUrl]
@@ -114,10 +124,10 @@ export function createOpenRouterProvider(options) {
           signal: AbortSignal.timeout(timeoutMs),
         });
       } catch (error) {
-        const reason = error instanceof Error ? error.message : String(error);
+        const reason = redactSecret(error instanceof Error ? error.message : String(error), options.apiKey);
         throw new ProviderError(`[${request.stepId}] request failed: ${reason}`, { cause: error });
       }
-      const raw = await response.text();
+      const raw = redactSecret(await response.text(), options.apiKey);
       if (!response.ok) {
         throw new ProviderError(
           `[${request.stepId}] provider returned HTTP ${response.status}: ${raw.slice(0, 300)}`,

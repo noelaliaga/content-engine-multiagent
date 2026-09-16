@@ -123,3 +123,39 @@ describe('OpenRouter provider (mocked HTTP)', () => {
     assert.throws(() => parseChatCompletion('<html>', 's'), /not JSON/);
   });
 });
+
+describe('API key redaction', () => {
+  test('a key echoed in an HTTP error body is redacted from the error', async () => {
+    const key = 'sk-test-fake-1111-not-a-real-key';
+    const { impl } = fakeFetch(400, { error: { message: `invalid header Authorization: Bearer ${key}` } });
+    const provider = createOpenRouterProvider({ apiKey: key, fetchImpl: impl });
+    await assert.rejects(provider.complete(REQUEST), (error) => {
+      assert.ok(error instanceof ProviderError);
+      assert.ok(!error.message.includes(key));
+      assert.match(error.message, /Bearer \[REDACTED\]/);
+      return true;
+    });
+  });
+
+  test('a key echoed in a 200 error payload or a network error is redacted too', async () => {
+    const key = 'sk-test-fake-2222-not-a-real-key';
+    const { impl } = fakeFetch(200, { error: { message: `key ${key} is disabled` } });
+    const provider = createOpenRouterProvider({ apiKey: key, fetchImpl: impl });
+    await assert.rejects(provider.complete(REQUEST), (error) => {
+      assert.ok(error instanceof ProviderError);
+      assert.equal(error.message, '[growth_strategist] provider error: key [REDACTED] is disabled');
+      return true;
+    });
+
+    /** @type {typeof fetch} */
+    const failing = async () => {
+      throw new TypeError(`connect failed for token ${key}`);
+    };
+    const offline = createOpenRouterProvider({ apiKey: key, fetchImpl: failing });
+    await assert.rejects(offline.complete(REQUEST), (error) => {
+      assert.ok(error instanceof ProviderError);
+      assert.ok(!error.message.includes(key));
+      return true;
+    });
+  });
+});
