@@ -21,6 +21,12 @@ export const SCORE_KEYS = /** @type {const} */ ([
 export const CALENDAR_DAYS = 7;
 
 /**
+ * Ideation must return at least this many ideas, so that a 7-day calendar usually survives
+ * a rejection or two in QA without repeating ideas.
+ */
+export const MIN_IDEAS = CALENDAR_DAYS + 1;
+
+/**
  * @param {string[]} values
  * @returns {string[]}
  */
@@ -70,7 +76,9 @@ export function checkIdeation(ideation, strategy) {
   /** @type {string[]} */
   const errors = [];
   const pillars = new Set(strategy.content_pillars.map((p) => p.pillar));
-  if (ideation.ideas.length === 0) errors.push('ideas must not be empty');
+  if (ideation.ideas.length < MIN_IDEAS) {
+    errors.push(`ideas must contain at least ${MIN_IDEAS} ideas, got ${ideation.ideas.length}`);
+  }
   for (const id of duplicates(ideation.ideas.map((idea) => idea.id))) {
     errors.push(`ideas has duplicate id "${id}"`);
   }
@@ -118,7 +126,30 @@ export function checkQa(qa, ideation) {
 }
 
 /**
+ * Ids the orchestrator may schedule: every idea whose (normalised) verdict is not `rejected`.
+ * @param {ContentQa} qa
+ * @returns {string[]}
+ */
+export function schedulableIdeaIds(qa) {
+  return qa.reviewed.filter((review) => review.verdict !== 'rejected').map((review) => review.id);
+}
+
+/**
+ * Checked before the orchestrator is called, so an impossible calendar costs no model call.
+ * @param {ContentQa} qa
+ * @returns {string[]}
+ */
+export function checkOrchestratorPrecondition(qa) {
+  if (schedulableIdeaIds(qa).length === 0) {
+    return ['no idea survived QA (all rejected), so no calendar can be built; revise the brief or the ideas'];
+  }
+  return [];
+}
+
+/**
  * Runs after QA normalisation, so `qa.reviewed[].verdict` is the engine's verdict.
+ * Rules: exactly 7 entries; known ids only; never a rejected idea; `revise` ideas only when
+ * fewer than 7 are approved; an idea may appear twice only when fewer than 7 ideas are schedulable.
  * @param {OrchestratorOutput} output
  * @param {ContentIdeation} ideation
  * @param {ContentQa} qa
@@ -130,6 +161,7 @@ export function checkOrchestrator(output, ideation, qa) {
   const ideaIds = new Set(ideation.ideas.map((idea) => idea.id));
   const verdicts = new Map(qa.reviewed.map((review) => [review.id, review.verdict]));
   const approvedCount = qa.reviewed.filter((review) => review.verdict === 'approved').length;
+  const schedulableCount = schedulableIdeaIds(qa).length;
   if (output.calendar_7_days.length !== CALENDAR_DAYS) {
     errors.push(
       `calendar_7_days must have exactly ${CALENDAR_DAYS} entries, got ${output.calendar_7_days.length}`,
@@ -151,5 +183,10 @@ export function checkOrchestrator(output, ideation, qa) {
       );
     }
   });
+  if (schedulableCount >= CALENDAR_DAYS) {
+    for (const id of duplicates(output.calendar_7_days.map((entry) => entry.idea_id))) {
+      errors.push(`calendar_7_days repeats idea "${id}" although ${schedulableCount} ideas can be scheduled`);
+    }
+  }
   return errors;
 }

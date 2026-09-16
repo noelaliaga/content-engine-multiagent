@@ -8,7 +8,7 @@
 import { mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { loadModelConfig, modelFor } from './config.js';
-import { InputError, StepFailedError } from './errors.js';
+import { InputError, StepBlockedError, StepFailedError } from './errors.js';
 import { exists, readJson, readText, writeJson } from './fsutil.js';
 import { defaultRunId, SLUG_PATTERN } from './ids.js';
 import { appendLearningLog, loadLearningLog } from './learning-log.js';
@@ -132,7 +132,8 @@ function truncate(text, limit) {
 /**
  * Runs the five steps for one client and persists every output under the run directory.
  * Throws InputError before any model call if the client input is invalid, ProviderError if
- * the provider fails, StepFailedError if a step exhausts its attempts. On failure, state.json
+ * the provider fails, StepFailedError if a step exhausts its attempts, StepBlockedError if a
+ * step's precondition fails (before paying for its call). On failure, state.json
  * is marked failed and ERROR.json is written; nothing is fabricated for the failed step.
  * @param {RunOptions} options
  * @returns {Promise<RunResult>}
@@ -228,6 +229,9 @@ export async function runPipeline(options) {
       await writeJson(statePath, state);
       log(`> ${step.id}`);
 
+      const unmet = step.precondition(ctx);
+      if (unmet.length > 0) throw new StepBlockedError(step.id, unmet);
+
       /** @type {ChatMessage[]} */
       const baseMessages = [{ role: 'user', content: JSON.stringify(step.buildInput(ctx), null, 2) }];
       let messages = baseMessages;
@@ -267,12 +271,9 @@ export async function runPipeline(options) {
       }
       if (!isAccepted) throw new StepFailedError(step.id, stepState.rejected_attempts);
 
-      let value = accepted;
-      if (step.normalize) {
-        const normalized = step.normalize(value, ctx);
-        value = normalized.value;
-        stepState.adjustments.push(...normalized.adjustments);
-      }
+      const normalized = step.normalize(accepted, ctx);
+      let value = normalized.value;
+      stepState.adjustments.push(...normalized.adjustments);
       if (step.id === 'orchestrator') {
         value = { .../** @type {object} */ (value), honesty_notes: [...HONESTY_NOTES] };
       }

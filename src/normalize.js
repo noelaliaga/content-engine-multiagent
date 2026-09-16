@@ -14,6 +14,12 @@ import { SCORE_KEYS } from './invariants.js';
 
 export const QA_THRESHOLDS = Object.freeze({ approved: 4, revise: 2.5 });
 
+/**
+ * Hard rule on top of the average: an idea whose `claim_safety` is at or below this value is
+ * rejected whatever its other scores are, so a guaranteed-result promise can never be scheduled.
+ */
+export const CLAIM_SAFETY_REJECT_AT_OR_BELOW = 1;
+
 /** @param {number} value */
 function round2(value) {
   return Math.round(value * 100) / 100;
@@ -39,7 +45,23 @@ export function verdictFor(average) {
 }
 
 /**
- * The model scores; the engine decides. Recomputes average, verdict and summary.
+ * Verdict policy: the average decides, except that an unsafe claim always rejects.
+ * @param {QaScores} scores
+ * @returns {{ average: number, verdict: Verdict, claimRule: boolean }} `claimRule` is true when
+ * the claim-safety rule overrode what the average alone would have decided.
+ */
+export function decideVerdict(scores) {
+  const average = averageScore(scores);
+  const byAverage = verdictFor(average);
+  if (scores.claim_safety <= CLAIM_SAFETY_REJECT_AT_OR_BELOW) {
+    return { average, verdict: 'rejected', claimRule: byAverage !== 'rejected' };
+  }
+  return { average, verdict: byAverage, claimRule: false };
+}
+
+/**
+ * The model scores; the engine decides. Recomputes average, verdict (including the
+ * claim-safety rule) and summary.
  * @param {ContentQa} qa
  * @returns {{ value: ContentQa, adjustments: string[] }}
  */
@@ -47,8 +69,13 @@ export function normalizeQa(qa) {
   /** @type {string[]} */
   const adjustments = [];
   const reviewed = qa.reviewed.map((review) => {
-    const average = averageScore(review.scores);
-    const verdict = verdictFor(average);
+    const { average, verdict, claimRule } = decideVerdict(review.scores);
+    if (claimRule) {
+      adjustments.push(
+        `${review.id}: claim_safety ${review.scores.claim_safety} forces rejected ` +
+          `(average ${average} alone would be ${verdictFor(average)})`,
+      );
+    }
     if (Math.abs(average - review.average_score) > 0.005) {
       adjustments.push(`${review.id}: average_score ${review.average_score} -> ${average}`);
     }
@@ -90,7 +117,12 @@ export function normalizeOrchestrator(output, ideation, qa, runId) {
   const verdicts = new Map(qa.reviewed.map((review) => [review.id, review.verdict]));
   const calendar = output.calendar_7_days.map((entry, index) => {
     const idea = ideas.get(entry.idea_id);
-    if (!idea) return entry;
+    if (!idea) {
+      // checkOrchestrator rejects unknown ids before normalisation; reaching this is a bug.
+      throw new Error(
+        `invariant broken: calendar_7_days[${index}] references unknown idea "${entry.idea_id}"`,
+      );
+    }
     /** @type {CalendarEntry} */
     const next = {
       ...entry,
@@ -106,6 +138,9 @@ export function normalizeOrchestrator(output, ideation, qa, runId) {
     }
     return next;
   });
+  if (output.learning_log_entry.run_id !== runId) {
+    adjustments.push(`learning_log_entry.run_id "${output.learning_log_entry.run_id}" -> "${runId}"`);
+  }
   return {
     value: {
       ...output,

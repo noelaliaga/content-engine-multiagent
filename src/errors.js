@@ -29,6 +29,20 @@ export class StepFailedError extends Error {
   }
 }
 
+/** A step cannot run with what the previous steps produced; raised before its model call. */
+export class StepBlockedError extends Error {
+  /**
+   * @param {string} stepId
+   * @param {string[]} problems
+   */
+  constructor(stepId, problems) {
+    super(`[${stepId}] cannot run: ${problems.join('; ')}`);
+    this.name = 'StepBlockedError';
+    this.stepId = stepId;
+    this.problems = problems;
+  }
+}
+
 /** Invalid CLI arguments or client data. Raised before any model call. */
 export class InputError extends Error {
   /** @param {string} message */

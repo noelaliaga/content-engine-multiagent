@@ -21,9 +21,9 @@ For **every** idea in `content_ideas` (same `id`, no omissions, no extra ids), o
   - `offer_connection` — how clear the bridge to the real offer (`run_context.brand.offer`) is; a purely top-of-funnel idea with no bridge scores low here if its pillar is `convert`;
   - `feasibility` — how realistic it is to produce with the resources a small brand actually has;
   - `originality` — how differentiated it is from what competitors already do;
-  - `claim_safety` — **score 0–1** for any guaranteed-result promise, specific income or outcome figure, or language implying a guarantee. This is non-negotiable when `run_context.constraints` forbids guaranteed results.
+  - `claim_safety` — **score 0–1** for any guaranteed-result promise, specific income or outcome figure, or language implying a guarantee, especially when `run_context.constraints` forbids guaranteed results. The engine enforces this: an idea with `claim_safety` of 0 or 1 is `rejected` whatever its other scores are.
 - `average_score` — the arithmetic mean of the seven scores.
-- `verdict` — `approved` if `average_score >= 4`, `revise` if `2.5 <= average_score < 4`, `rejected` if `average_score < 2.5`.
+- `verdict` — `rejected` if `claim_safety <= 1`; otherwise `approved` if `average_score >= 4`, `revise` if `2.5 <= average_score < 4`, `rejected` if `average_score < 2.5`.
 - `reason` — a concrete justification that names the scores that drove the verdict.
 - `improvement_suggestion` — a concrete, actionable change.
 

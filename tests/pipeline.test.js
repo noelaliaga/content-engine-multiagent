@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { after, before, describe, test } from 'node:test';
-import { InputError, ProviderError, StepFailedError } from '../src/errors.js';
+import { InputError, ProviderError, StepBlockedError, StepFailedError } from '../src/errors.js';
 import { HONESTY_NOTES, runPipeline } from '../src/pipeline.js';
 import { createFixtureProvider } from '../src/providers/fixture.js';
 import {
@@ -278,10 +278,91 @@ describe('cross-step invariants (hallucination containment)', () => {
   });
 });
 
+describe('calendar feasibility', () => {
+  /**
+   * QA where only the listed ideas survive; every other idea gets claim_safety 0.
+   * @param {string[]} keep
+   */
+  async function qaKeeping(keep) {
+    const qa = await fixture('content_qa');
+    for (const review of qa.reviewed) {
+      if (!keep.includes(review.id)) review.scores.claim_safety = 0;
+    }
+    return JSON.stringify(qa);
+  }
+
+  test('ideation with fewer ideas than the minimum is rejected', async () => {
+    const short = await fixture('content_ideation');
+    short.ideas = short.ideas.slice(0, 4);
+    const script = await happyScript();
+    script.content_ideation = [JSON.stringify(short), await fixtureText('content_ideation')];
+    const { provider, calls } = createScriptedProvider(script);
+    const result = await run({ provider, runId: 'few-ideas' });
+    assert.ok(
+      (result.state.steps[2]?.rejected_attempts[0] ?? []).includes(
+        'ideas must contain at least 8 ideas, got 4',
+      ),
+    );
+    const input = JSON.parse(calls[2]?.messages[0]?.content ?? '{}');
+    assert.equal(input.min_ideas, 8, 'the minimum is sent to the model');
+  });
+
+  test('with fewer than 7 schedulable ideas the calendar may repeat them', async () => {
+    const script = await happyScript();
+    script.content_qa = [await qaKeeping(['idea_01', 'idea_02', 'idea_07'])];
+    const calendar = await fixture('orchestrator');
+    const ids = ['idea_01', 'idea_02', 'idea_07', 'idea_01', 'idea_02', 'idea_01', 'idea_02'];
+    calendar.calendar_7_days.forEach((/** @type {{ idea_id: string }} */ entry, /** @type {number} */ i) => {
+      entry.idea_id = ids[i] ?? '';
+    });
+    script.orchestrator = [JSON.stringify(calendar)];
+    const { provider } = createScriptedProvider(script);
+    const result = await run({ provider, runId: 'repeat-ok' });
+    assert.equal(result.state.status, 'completed');
+    assert.deepEqual(
+      result.final.calendar_7_days.map((entry) => entry.idea_id),
+      ids,
+    );
+    assert.equal(result.final.calendar_7_days[2]?.status, 'revise_before_publish');
+  });
+
+  test('repeating an idea is rejected when 7 or more ideas can be scheduled', async () => {
+    const calendar = await fixture('orchestrator');
+    calendar.calendar_7_days[1].idea_id = 'idea_01';
+    const script = await happyScript();
+    script.orchestrator = [JSON.stringify(calendar), await fixtureText('orchestrator')];
+    const { provider } = createScriptedProvider(script);
+    const result = await run({ provider, runId: 'repeat-bad' });
+    assert.ok(
+      (result.state.steps[4]?.rejected_attempts[0] ?? []).includes(
+        'calendar_7_days repeats idea "idea_01" although 7 ideas can be scheduled',
+      ),
+    );
+  });
+
+  test('if QA rejects every idea the orchestrator is never called', async () => {
+    const script = await happyScript();
+    script.content_qa = [await qaKeeping([])];
+    const { provider, calls } = createScriptedProvider(script);
+    await assert.rejects(run({ provider, runId: 'nothing-left' }), (error) => {
+      assert.ok(error instanceof StepBlockedError);
+      assert.equal(error.stepId, 'orchestrator');
+      assert.match(error.message, /no idea survived QA/);
+      return true;
+    });
+    assert.equal(calls.filter((call) => call.stepId === 'orchestrator').length, 0);
+    const errorFile = await readJsonFile(
+      path.join(sandbox.root, 'test-runs', 'nothing-left__mock', 'ERROR.json'),
+    );
+    assert.equal(errorFile.type, 'StepBlockedError');
+    assert.equal(errorFile.step, 'orchestrator');
+  });
+});
+
 describe('deterministic normalisation', () => {
   test('QA average, verdict and summary are recomputed from the scores', async () => {
     const lying = await fixture('content_qa');
-    lying.reviewed[7].verdict = 'approved'; // idea_08 averages 2.43 -> rejected
+    lying.reviewed[7].verdict = 'approved'; // idea_08 averages 3.0 but claim_safety 0 -> rejected
     lying.reviewed[7].average_score = 4.9;
     lying.summary = { approved: 8, revise: 0, rejected: 0 };
     const script = await happyScript();
@@ -291,11 +372,53 @@ describe('deterministic normalisation', () => {
 
     const qa = await readJsonFile(path.join(result.runDir, '04_content_qa.json'));
     assert.equal(qa.reviewed[7].verdict, 'rejected');
-    assert.equal(qa.reviewed[7].average_score, 2.43);
+    assert.equal(qa.reviewed[7].average_score, 3);
     assert.deepEqual(qa.summary, { approved: 6, revise: 1, rejected: 1 });
     const adjustments = result.state.steps[3]?.adjustments ?? [];
     assert.ok(adjustments.includes('idea_08: verdict approved -> rejected'));
     assert.ok(adjustments.some((a) => a.startsWith('summary ')));
+    assert.ok(
+      adjustments.includes('idea_08: claim_safety 0 forces rejected (average 3 alone would be revise)'),
+    );
+  });
+
+  test('an unsafe claim is rejected whatever the other scores, and cannot be scheduled', async () => {
+    const qa = await fixture('content_qa');
+    const review = qa.reviewed[0]; // idea_01, scheduled on day 1 by the orchestrator fixture
+    review.scores = {
+      on_brand: 5,
+      hook_strength: 5,
+      pillar_fit: 5,
+      offer_connection: 5,
+      feasibility: 5,
+      originality: 5,
+      claim_safety: 0,
+    };
+    review.average_score = 4.29;
+    review.verdict = 'approved';
+    const script = await happyScript();
+    script.content_qa = [JSON.stringify(qa)];
+    const orchestrator = await fixtureText('orchestrator');
+    script.orchestrator = [orchestrator, orchestrator];
+    const { provider } = createScriptedProvider(script);
+
+    await assert.rejects(run({ provider, runId: 'claim-rule' }), (error) => {
+      assert.ok(error instanceof StepFailedError);
+      assert.equal(error.stepId, 'orchestrator');
+      assert.ok(error.attemptErrors[0]?.includes('calendar_7_days[0] schedules rejected idea "idea_01"'));
+      return true;
+    });
+    const saved = await readJsonFile(
+      path.join(sandbox.root, 'test-runs', 'claim-rule__mock', '04_content_qa.json'),
+    );
+    assert.equal(saved.reviewed[0].average_score, 4.29);
+    assert.equal(saved.reviewed[0].verdict, 'rejected');
+    const state = await readJsonFile(path.join(sandbox.root, 'test-runs', 'claim-rule__mock', 'state.json'));
+    assert.ok(
+      state.steps[3].adjustments.includes(
+        'idea_01: claim_safety 0 forces rejected (average 4.29 alone would be approved)',
+      ),
+    );
   });
 
   test('calendar fields are copied from the referenced idea and its verdict', async () => {
@@ -312,7 +435,9 @@ describe('deterministic normalisation', () => {
     assert.equal(first?.format, 'reel');
     assert.equal(first?.pillar, 'Rescue with a bridge');
     assert.equal(result.final.calendar_7_days[6]?.status, 'revise_before_publish');
-    assert.equal(result.state.steps[4]?.adjustments.length, 3);
+    const adjustments = result.state.steps[4]?.adjustments ?? [];
+    assert.equal(adjustments.length, 4);
+    assert.ok(adjustments.includes('learning_log_entry.run_id "set-by-engine" -> "normalize-calendar"'));
   });
 });
 
@@ -328,6 +453,35 @@ describe('error handling', () => {
     );
     assert.equal(errorFile.type, 'ProviderError');
     assert.equal(errorFile.step, 'content_qa');
+  });
+
+  test('an API key echoed in a provider error never reaches state.json or ERROR.json', async () => {
+    const { createOpenRouterProvider } = await import('../src/providers/openrouter.js');
+    const key = 'sk-test-fake-0000-not-a-real-key';
+    /** @type {typeof fetch} */
+    const echoingProxy = async (_url, init) => {
+      const headers = /** @type {Record<string, string>} */ (init?.headers ?? {});
+      return new Response(`upstream rejected request with headers: ${headers.authorization}`, {
+        status: 502,
+      });
+    };
+    const provider = createOpenRouterProvider({
+      apiKey: key,
+      baseUrl: 'https://proxy.example.com/v1',
+      fetchImpl: echoingProxy,
+    });
+    await assert.rejects(run({ provider, runId: 'leak-check' }), (error) => {
+      assert.ok(error instanceof ProviderError);
+      assert.ok(!error.message.includes(key));
+      assert.match(error.message, /Bearer \[REDACTED\]/);
+      return true;
+    });
+    const runDir = path.join(sandbox.root, 'test-runs', 'leak-check');
+    for (const file of ['state.json', 'ERROR.json']) {
+      const text = await readFile(path.join(runDir, file), 'utf8');
+      assert.ok(!text.includes(key), `${file} must not contain the key`);
+      assert.match(text, /\[REDACTED\]/);
+    }
   });
 
   test('invalid client input fails before any model call', async () => {

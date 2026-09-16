@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { after, before, test } from 'node:test';
 import { promisify } from 'node:util';
+import vm from 'node:vm';
 import { buildDashboard, escapeHtml, serializeForScript } from '../src/dashboard.js';
 import { runPipeline } from '../src/pipeline.js';
 import { fixedNow, fixture, happyScript, makeSandbox, REPO_ROOT } from './helpers.js';
@@ -55,6 +56,72 @@ test('builds a self-contained dashboard for a completed run', async () => {
   assert.doesNotMatch(html, /https?:\/\/(?!quillfern\.example\.com)/, 'no external resources');
   assert.equal(html.match(/<\/script>/g)?.length, 1);
   assert.match(html, /Hostile \\u003c\/script> hook \$& \$1/);
+});
+
+/**
+ * Executes the dashboard's inline script against a minimal fake DOM and returns the HTML it
+ * assigns to each view. This exercises the template's own esc(), not only the server helpers.
+ * @param {string} html
+ * @returns {Record<string, string>}
+ */
+function renderViews(html) {
+  const script = html.slice(html.indexOf('<script>') + '<script>'.length, html.lastIndexOf('</script>'));
+  /** @type {Record<string, { innerHTML: string }>} */
+  const views = {};
+  const document = {
+    /** @param {string} id */
+    getElementById: (id) => {
+      views[id] ??= { innerHTML: '' };
+      return views[id];
+    },
+    querySelectorAll: () => [],
+  };
+  vm.runInNewContext(script, { document });
+  return Object.fromEntries(Object.entries(views).map(([id, view]) => [id, view.innerHTML]));
+}
+
+test('model text is escaped by the template before it reaches innerHTML', async () => {
+  const payload = '<img src=x onerror="alert(1)">';
+  const script = await happyScript();
+  const ideas = await fixture('content_ideation');
+  ideas.ideas[0].hook = payload;
+  ideas.ideas[0].script_outline.cta = payload;
+  script.content_ideation = [JSON.stringify(ideas)];
+  const qa = await fixture('content_qa');
+  qa.reviewed[0].reason = payload;
+  script.content_qa = [JSON.stringify(qa)];
+  const strategy = await fixture('growth_strategist');
+  strategy.content_pillars[0].rationale = payload;
+  script.growth_strategist = [JSON.stringify(strategy)];
+  const brand = await fixture('brand_analyst');
+  brand.current_positioning = payload;
+  script.brand_analyst = [JSON.stringify(brand)];
+  const orchestrator = await fixture('orchestrator');
+  orchestrator.metrics_to_track[0].metric = payload;
+  orchestrator.calendar_7_days[0].date_label = payload;
+  script.orchestrator = [JSON.stringify(orchestrator)];
+  const { provider } = createScriptedProvider(script);
+  const result = await runPipeline({
+    rootDir: sandbox.root,
+    clientSlug: 'quillfern',
+    runId: 'dash-xss',
+    provider,
+    now: fixedNow,
+    runsDir: path.join(sandbox.root, 'runs-out'),
+  });
+  const { outPath } = await buildDashboard({
+    rootDir: sandbox.root,
+    runDir: result.runDir,
+    clientDir: path.join(sandbox.root, 'clients', 'quillfern'),
+  });
+  const views = renderViews(await readFile(outPath, 'utf8'));
+  const escaped = '&lt;img src=x onerror=&quot;alert(1)&quot;&gt;';
+  for (const id of ['view-brand', 'view-growth', 'view-ideation', 'view-qa', 'view-orchestrator']) {
+    const rendered = views[id] ?? '';
+    assert.ok(rendered.length > 0, `${id} was rendered`);
+    assert.doesNotMatch(rendered, /<img/i, `${id} contains no raw tag from model text`);
+    assert.ok(rendered.includes(escaped), `${id} shows the payload as text`);
+  }
 });
 
 test('refuses to render an incomplete run', async () => {
