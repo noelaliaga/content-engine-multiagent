@@ -17,16 +17,24 @@ export const STEP_ORDER = [
 ];
 
 /**
- * Creates a throwaway project root with engine/ and clients/ copied from the repo.
+ * Only the versioned clients are copied: clients a user scaffolds locally (for example with
+ * `npm run new-client -- acme-widgets`) must not leak into, or collide with, the tests.
+ */
+export const VERSIONED_CLIENTS = Object.freeze(['_template', 'quillfern']);
+
+/**
+ * Creates a throwaway project root with engine/ and the versioned clients copied from the repo.
  * @returns {Promise<{ root: string, cleanup: () => Promise<void> }>}
  */
 export async function makeSandbox() {
   const root = await mkdtemp(path.join(tmpdir(), 'content-engine-test-'));
   await cp(path.join(REPO_ROOT, 'engine'), path.join(root, 'engine'), { recursive: true });
-  await cp(path.join(REPO_ROOT, 'clients'), path.join(root, 'clients'), {
-    recursive: true,
-    filter: (source) => !source.split(path.sep).includes('runs'),
-  });
+  for (const client of VERSIONED_CLIENTS) {
+    await cp(path.join(REPO_ROOT, 'clients', client), path.join(root, 'clients', client), {
+      recursive: true,
+      filter: (source) => !source.split(path.sep).includes('runs'),
+    });
+  }
   return { root, cleanup: () => rm(root, { recursive: true, force: true }) };
 }
 
@@ -49,10 +57,10 @@ export async function fixture(stepId) {
 
 /**
  * A script where every step answers once with its valid fixture.
- * @returns {Promise<Record<string, import('../src/providers/scripted.js').ScriptedReply[]>>}
+ * @returns {Promise<Record<string, import('./support/scripted-provider.js').ScriptedReply[]>>}
  */
 export async function happyScript() {
-  /** @type {Record<string, import('../src/providers/scripted.js').ScriptedReply[]>} */
+  /** @type {Record<string, import('./support/scripted-provider.js').ScriptedReply[]>} */
   const script = {};
   for (const stepId of STEP_ORDER) script[stepId] = [await fixtureText(stepId)];
   return script;

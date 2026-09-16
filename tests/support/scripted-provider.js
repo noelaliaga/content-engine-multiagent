@@ -1,8 +1,8 @@
-import { ProviderError } from '../errors.js';
+import { ProviderError } from '../../src/errors.js';
 
 /**
- * @typedef {import('../types.js').LlmRequest} LlmRequest
- * @typedef {import('../types.js').LlmProvider} LlmProvider
+ * @typedef {import('../../src/types.js').LlmRequest} LlmRequest
+ * @typedef {import('../../src/types.js').LlmProvider} LlmProvider
  * @typedef {string | Error | ((request: LlmRequest) => string)} ScriptedReply
  */
 

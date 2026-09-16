@@ -6,8 +6,8 @@ import { after, before, test } from 'node:test';
 import { promisify } from 'node:util';
 import { buildDashboard, escapeHtml, serializeForScript } from '../src/dashboard.js';
 import { runPipeline } from '../src/pipeline.js';
-import { createScriptedProvider } from '../src/providers/scripted.js';
 import { fixedNow, fixture, happyScript, makeSandbox, REPO_ROOT } from './helpers.js';
+import { createScriptedProvider } from './support/scripted-provider.js';
 
 const exec = promisify(execFile);
 

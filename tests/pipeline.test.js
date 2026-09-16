@@ -5,7 +5,6 @@ import { after, before, describe, test } from 'node:test';
 import { InputError, ProviderError, StepFailedError } from '../src/errors.js';
 import { HONESTY_NOTES, runPipeline } from '../src/pipeline.js';
 import { createFixtureProvider } from '../src/providers/fixture.js';
-import { createScriptedProvider } from '../src/providers/scripted.js';
 import {
   fixedNow,
   fixture,
@@ -15,6 +14,7 @@ import {
   readJsonFile,
   STEP_ORDER,
 } from './helpers.js';
+import { createScriptedProvider } from './support/scripted-provider.js';
 
 /** @type {{ root: string, cleanup: () => Promise<void> }} */
 let sandbox;
