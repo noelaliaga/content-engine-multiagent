@@ -1,0 +1,76 @@
+{
+  "type": "object",
+  "properties": {
+    "current_positioning": { "type": "string" },
+    "strengths": { "type": "array", "items": { "type": "string" } },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "gap": { "type": "string" },
+          "type": {
+            "type": "string",
+            "enum": ["reach", "conversion", "positioning", "offer", "trust"]
+          },
+          "why_it_matters": { "type": "string" }
+        },
+        "required": ["gap", "type", "why_it_matters"],
+        "additionalProperties": false
+      }
+    },
+    "viral_patterns_observed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "pattern": { "type": "string" },
+          "source_reference": { "type": "string" },
+          "hook_mechanic": { "type": "string" },
+          "format": { "type": "string" },
+          "emotion": { "type": "string" },
+          "funnel_stage": { "type": "string", "enum": ["TOFU", "MOFU", "BOFU"] },
+          "commercial_intent": { "type": "string", "enum": ["low", "medium", "high"] },
+          "why_it_works": { "type": "string" },
+          "adaptation_opportunity": { "type": "string" },
+          "risk_if_overused": { "type": "string" }
+        },
+        "required": [
+          "pattern",
+          "source_reference",
+          "hook_mechanic",
+          "format",
+          "emotion",
+          "funnel_stage",
+          "commercial_intent",
+          "why_it_works",
+          "adaptation_opportunity",
+          "risk_if_overused"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "opportunity_angles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "angle": { "type": "string" },
+          "why": { "type": "string" }
+        },
+        "required": ["angle", "why"],
+        "additionalProperties": false
+      }
+    },
+    "confidence_notes": { "type": "string" }
+  },
+  "required": [
+    "current_positioning",
+    "strengths",
+    "gaps",
+    "viral_patterns_observed",
+    "opportunity_angles",
+    "confidence_notes"
+  ],
+  "additionalProperties": false
+}

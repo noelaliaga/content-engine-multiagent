@@ -1,0 +1,48 @@
+{
+  "type": "object",
+  "properties": {
+    "calendar_7_days": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "day": { "type": "string" },
+          "date_label": { "type": "string" },
+          "idea_id": { "type": "string" },
+          "format": { "type": "string" },
+          "pillar": { "type": "string" },
+          "intended_action": { "type": "string", "enum": ["reach", "nurture", "convert"] },
+          "status": { "type": "string", "enum": ["approved", "revise_before_publish"] }
+        },
+        "required": ["day", "date_label", "idea_id", "format", "pillar", "intended_action", "status"],
+        "additionalProperties": false
+      }
+    },
+    "metrics_to_track": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "metric": { "type": "string" },
+          "why_it_matters": { "type": "string" },
+          "target_signal": { "type": "string" }
+        },
+        "required": ["metric", "why_it_matters", "target_signal"],
+        "additionalProperties": false
+      }
+    },
+    "learning_log_entry": {
+      "type": "object",
+      "properties": {
+        "run_id": { "type": "string" },
+        "what_worked": { "type": "array", "items": { "type": "string" } },
+        "what_was_rejected_and_why": { "type": "array", "items": { "type": "string" } },
+        "next_run_recommendations": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["run_id", "what_worked", "what_was_rejected_and_why", "next_run_recommendations"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["calendar_7_days", "metrics_to_track", "learning_log_entry"],
+  "additionalProperties": false
+}

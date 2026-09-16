@@ -1,0 +1,32 @@
+{
+  "$comment": "Validates clients/<slug>/run_context.json before any model call, so malformed client input fails fast and costs nothing.",
+  "type": "object",
+  "properties": {
+    "run_id": { "type": "string" },
+    "synthetic": { "type": "boolean" },
+    "brand": {
+      "type": "object",
+      "properties": {
+        "handle": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "followers": { "type": "integer", "minimum": 0 },
+        "base": { "type": "string" },
+        "website": { "type": "string" },
+        "bio": { "type": "string", "minLength": 1 },
+        "highlights": { "type": "array", "items": { "type": "string" } },
+        "content_observed": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "funnel_observed": { "type": "string", "minLength": 1 },
+        "offer": { "type": "string", "minLength": 1 }
+      },
+      "required": ["handle", "name", "bio", "content_observed", "funnel_observed", "offer"],
+      "additionalProperties": false
+    },
+    "goal": { "type": "string", "minLength": 1 },
+    "constraints": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "analysis_hypotheses": { "type": "array", "items": { "type": "string" } },
+    "hypothesis_gap_index": { "type": "integer" },
+    "hypothesis_note_index": { "type": "integer" }
+  },
+  "required": ["brand", "goal", "constraints"],
+  "additionalProperties": false
+}

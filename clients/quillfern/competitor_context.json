@@ -1,0 +1,30 @@
+{
+  "synthetic_notice": "Fictional observations written for the sample client. No real accounts are referenced.",
+  "niche": "Houseplants for beginners / plant-care subscriptions",
+  "strategy_principle": "80% proven niche patterns adapted with care, 20% own experiments",
+  "manual_observations": [
+    "Plant-rescue transformations are the most shared format across the niche: a visible problem and a visible fix.",
+    "Accounts that answer one reader question per video build strong comment engagement.",
+    "Subscription brands in the niche rarely show month-two struggles, even though that is when beginners give up."
+  ],
+  "observed_patterns": [
+    {
+      "source_reference": "Generic plant-rescue creator format",
+      "format": "30-second before/after reel",
+      "hook_mechanic": "Before/after with a dying plant in the first frame",
+      "emotion": "relief",
+      "likely_funnel_stage": "TOFU",
+      "commercial_intent": "low",
+      "risk_if_overused": "Becomes spectacle with no bridge to the offer"
+    },
+    {
+      "source_reference": "Generic plant-doctor Q&A format",
+      "format": "Talking-head short answering a follower question",
+      "hook_mechanic": "Common mistake called out in the first line",
+      "emotion": "recognition",
+      "likely_funnel_stage": "MOFU",
+      "commercial_intent": "medium",
+      "risk_if_overused": "Feels like homework if every video is a lesson"
+    }
+  ]
+}

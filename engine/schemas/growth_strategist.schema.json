@@ -1,0 +1,42 @@
+{
+  "type": "object",
+  "properties": {
+    "positioning_statement": { "type": "string" },
+    "target_audience": { "type": "string" },
+    "content_pillars": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "pillar": { "type": "string" },
+          "purpose": { "type": "string", "enum": ["reach", "nurture", "convert"] },
+          "rationale": { "type": "string" },
+          "patterns_to_use": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["pillar", "purpose", "rationale", "patterns_to_use"],
+        "additionalProperties": false
+      }
+    },
+    "content_mix": {
+      "type": "object",
+      "properties": {
+        "market_proven_patterns": { "type": "integer" },
+        "original_experiments": { "type": "integer" },
+        "reach": { "type": "integer" },
+        "nurture": { "type": "integer" },
+        "convert": { "type": "integer" }
+      },
+      "required": ["market_proven_patterns", "original_experiments", "reach", "nurture", "convert"],
+      "additionalProperties": false
+    },
+    "strategic_notes": { "type": "array", "items": { "type": "string" } }
+  },
+  "required": [
+    "positioning_statement",
+    "target_audience",
+    "content_pillars",
+    "content_mix",
+    "strategic_notes"
+  ],
+  "additionalProperties": false
+}

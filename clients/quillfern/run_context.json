@@ -1,0 +1,33 @@
+{
+  "synthetic": true,
+  "brand": {
+    "handle": "@quillfern.example",
+    "name": "Quillfern Plant Co.",
+    "followers": 18400,
+    "base": "Fictional; ships within the EU",
+    "website": "https://quillfern.example.com",
+    "bio": "Houseplants that survive beginners. Monthly care kits + a plant-care chat. DM RESCUE for the free checklist.",
+    "highlights": ["Plant doctor", "Unboxings", "Care guides"],
+    "content_observed": [
+      "Repotting and propagation reels with ASMR audio",
+      "Before/after rescued-plant transformations",
+      "Aesthetic shelf tours with no mention of the subscription",
+      "Occasional carousels on watering and light"
+    ],
+    "funnel_observed": "Reels -> profile -> link in bio -> subscription page; DM keyword RESCUE sends a free care checklist",
+    "offer": "Monthly beginner care-kit subscription (fictional price EUR 24/month): one easy plant, soil mix and access to a plant-care chat"
+  },
+  "goal": "Increase trial subscriptions coming from Instagram without losing the reach of repotting reels",
+  "constraints": [
+    "keep the ASMR repotting format that drives reach",
+    "warm, reassuring tone; never shame beginners",
+    "never promise that a plant cannot die or any guaranteed result",
+    "do not sound like generic AI copy",
+    "quality over quantity"
+  ],
+  "analysis_hypotheses": [
+    "Rescue transformations drive reach but rarely bridge to the subscription.",
+    "Subscriber testimonials are nearly absent from the feed.",
+    "The feed over-indexes on aesthetic top-of-funnel content versus care education."
+  ]
+}

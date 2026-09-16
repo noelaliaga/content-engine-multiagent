@@ -1,0 +1,51 @@
+{
+  "type": "object",
+  "properties": {
+    "ideas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "pillar": { "type": "string" },
+          "format": {
+            "type": "string",
+            "enum": ["reel", "carousel", "post", "story", "ad", "email", "short"]
+          },
+          "hook": { "type": "string" },
+          "concept": { "type": "string" },
+          "script_outline": {
+            "type": "object",
+            "properties": {
+              "opening": { "type": "string" },
+              "body": { "type": "string" },
+              "turn": { "type": "string" },
+              "cta": { "type": "string" }
+            },
+            "required": ["opening", "body", "turn", "cta"],
+            "additionalProperties": false
+          },
+          "intended_action": { "type": "string", "enum": ["reach", "nurture", "convert"] },
+          "pattern_source": { "type": "string" },
+          "why_this_could_work": { "type": "string" },
+          "cta": { "type": "string" }
+        },
+        "required": [
+          "id",
+          "pillar",
+          "format",
+          "hook",
+          "concept",
+          "script_outline",
+          "intended_action",
+          "pattern_source",
+          "why_this_could_work",
+          "cta"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["ideas"],
+  "additionalProperties": false
+}

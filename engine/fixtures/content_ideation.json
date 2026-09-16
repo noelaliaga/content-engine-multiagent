@@ -1,0 +1,140 @@
+{
+  "ideas": [
+    {
+      "id": "idea_01",
+      "pillar": "Rescue with a bridge",
+      "format": "reel",
+      "hook": "This pothos was one watering away from the bin.",
+      "concept": "ASMR rescue of an overwatered pothos that ends on the three-step routine that saved it.",
+      "script_outline": {
+        "opening": "Close-up of yellow, drooping leaves and soggy soil.",
+        "body": "Unpot, trim rotten roots, fresh soil mix, all with ASMR audio.",
+        "turn": "Two weeks later: new leaf; the fix was watering less, not more.",
+        "cta": "DM RESCUE for the checklist we used."
+      },
+      "intended_action": "reach",
+      "pattern_source": "Plant rescue before/after",
+      "why_this_could_work": "Keeps the reach format and adds the missing bridge to the checklist DM.",
+      "cta": "DM RESCUE"
+    },
+    {
+      "id": "idea_02",
+      "pillar": "Rescue with a bridge",
+      "format": "short",
+      "hook": "Guess what killed this calathea. It was not the light.",
+      "concept": "Open-loop rescue: viewers guess the cause, the answer arrives with the fix.",
+      "script_outline": {
+        "opening": "Crispy calathea on a sunny shelf.",
+        "body": "Rule out light and water on screen, one by one.",
+        "turn": "Reveal: tap-water minerals; show the swap to filtered water.",
+        "cta": "Comment your guess, then DM RESCUE for the checklist."
+      },
+      "intended_action": "reach",
+      "pattern_source": "Open loop",
+      "why_this_could_work": "Comment-driven reach plus a bridge to the checklist.",
+      "cta": "Comment + DM RESCUE"
+    },
+    {
+      "id": "idea_03",
+      "pillar": "First-90-days confidence",
+      "format": "carousel",
+      "hook": "Month two is when most beginner plants struggle. Here is what is normal.",
+      "concept": "Slide-by-slide guide separating normal month-two changes from real warning signs.",
+      "script_outline": {
+        "opening": "Cover: 'Normal or problem?'",
+        "body": "Five common changes, each labelled normal or act-now.",
+        "turn": "The most common 'problem' is actually normal acclimatisation.",
+        "cta": "Save this for week six."
+      },
+      "intended_action": "nurture",
+      "pattern_source": "Myth vs reality",
+      "why_this_could_work": "Care education aimed at the churn-prone month, answering the positioning gap.",
+      "cta": "Save"
+    },
+    {
+      "id": "idea_04",
+      "pillar": "First-90-days confidence",
+      "format": "email",
+      "hook": "Your plant is not dying, it is moving house.",
+      "concept": "Welcome-series email explaining acclimatisation for new subscribers.",
+      "script_outline": {
+        "opening": "Reassure: leaf drop in week one is expected.",
+        "body": "Three things to check and one thing to leave alone.",
+        "turn": "Doing less is the hardest and most useful step.",
+        "cta": "Reply with a photo and the plant-care chat will take a look."
+      },
+      "intended_action": "nurture",
+      "pattern_source": "Teach-a-piece",
+      "why_this_could_work": "Reduces early anxiety for subscribers and showcases the chat.",
+      "cta": "Reply with a photo"
+    },
+    {
+      "id": "idea_05",
+      "pillar": "Subscriber proof",
+      "format": "reel",
+      "hook": "She had killed four plants before this one.",
+      "concept": "A (consenting) subscriber's first 90 days, told through her own chat messages.",
+      "script_outline": {
+        "opening": "Screenshot of her first worried message.",
+        "body": "Three chat moments: overwatering, light, a new leaf.",
+        "turn": "Her fifth plant is the one still alive.",
+        "cta": "Start your first kit from the link in bio."
+      },
+      "intended_action": "convert",
+      "pattern_source": "Social proof",
+      "why_this_could_work": "Third-party proof aimed at the exact fear of the buyer persona.",
+      "cta": "Link in bio"
+    },
+    {
+      "id": "idea_06",
+      "pillar": "Subscriber proof",
+      "format": "carousel",
+      "hook": "What 'bad with plants' looked like after one month of the kit.",
+      "concept": "Before/after photos from three consenting subscribers with one lesson each.",
+      "script_outline": {
+        "opening": "Cover with three month-one photos.",
+        "body": "One slide per subscriber: problem, chat tip, result.",
+        "turn": "None of them changed flats or bought grow lights.",
+        "cta": "See what is in this month's kit via the link in bio."
+      },
+      "intended_action": "convert",
+      "pattern_source": "Before/after",
+      "why_this_could_work": "Combines proof and a clear bridge to the offer.",
+      "cta": "Link in bio"
+    },
+    {
+      "id": "idea_07",
+      "pillar": "First-90-days confidence",
+      "format": "story",
+      "hook": "Plant doctor is in: send us your saddest leaf.",
+      "concept": "Weekly story Q&A answering follower photos live.",
+      "script_outline": {
+        "opening": "Question sticker inviting photos.",
+        "body": "Answer three submissions with quick fixes.",
+        "turn": "Show that most fixes cost nothing.",
+        "cta": "Subscribers get this in the chat every day."
+      },
+      "intended_action": "nurture",
+      "pattern_source": "Plant-doctor Q&A",
+      "why_this_could_work": "Builds trust through visible help; depends on weekly availability.",
+      "cta": "Mention the chat"
+    },
+    {
+      "id": "idea_08",
+      "pillar": "Subscriber proof",
+      "format": "ad",
+      "hook": "Our plants never die. Guaranteed.",
+      "concept": "Paid ad promising a plant that cannot die with the subscription.",
+      "script_outline": {
+        "opening": "Healthy plant spinning on a turntable.",
+        "body": "Bold text: 'never dies, guaranteed'.",
+        "turn": "Price reveal.",
+        "cta": "Subscribe now."
+      },
+      "intended_action": "convert",
+      "pattern_source": "Result reveal",
+      "why_this_could_work": "Direct offer, but relies on a guaranteed-outcome claim.",
+      "cta": "Subscribe now"
+    }
+  ]
+}

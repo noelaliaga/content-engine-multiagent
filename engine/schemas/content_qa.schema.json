@@ -1,0 +1,54 @@
+{
+  "type": "object",
+  "properties": {
+    "reviewed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "scores": {
+            "type": "object",
+            "properties": {
+              "on_brand": { "type": "integer" },
+              "hook_strength": { "type": "integer" },
+              "pillar_fit": { "type": "integer" },
+              "offer_connection": { "type": "integer" },
+              "feasibility": { "type": "integer" },
+              "originality": { "type": "integer" },
+              "claim_safety": { "type": "integer" }
+            },
+            "required": [
+              "on_brand",
+              "hook_strength",
+              "pillar_fit",
+              "offer_connection",
+              "feasibility",
+              "originality",
+              "claim_safety"
+            ],
+            "additionalProperties": false
+          },
+          "average_score": { "type": "number" },
+          "verdict": { "type": "string", "enum": ["approved", "revise", "rejected"] },
+          "reason": { "type": "string" },
+          "improvement_suggestion": { "type": "string" }
+        },
+        "required": ["id", "scores", "average_score", "verdict", "reason", "improvement_suggestion"],
+        "additionalProperties": false
+      }
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "approved": { "type": "integer" },
+        "revise": { "type": "integer" },
+        "rejected": { "type": "integer" }
+      },
+      "required": ["approved", "revise", "rejected"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["reviewed", "summary"],
+  "additionalProperties": false
+}

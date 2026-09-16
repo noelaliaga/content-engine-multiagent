@@ -1,0 +1,62 @@
+{
+  "current_positioning": "The feed positions Quillfern as a calm, satisfying plant-ASMR channel rather than as the subscription that keeps beginners' plants alive: the reach comes from repotting spectacle, while the offer (care kit + plant-care chat) is almost invisible.",
+  "strengths": [
+    "Repotting and propagation reels with ASMR audio are a reliable reach engine for the brand.",
+    "Rescued-plant before/after transformations already show the exact outcome beginners want.",
+    "The warm, non-shaming tone matches a buyer persona that feels 'bad with plants'."
+  ],
+  "gaps": [
+    {
+      "gap": "Rescue transformations end without any bridge to the subscription or the RESCUE checklist DM.",
+      "type": "conversion",
+      "why_it_matters": "The goal is trial subscriptions from Instagram; the highest-reach format currently sends viewers nowhere near the offer."
+    },
+    {
+      "gap": "Subscriber testimonials are nearly absent from the feed.",
+      "type": "trust",
+      "why_it_matters": "Beginners who have already killed plants doubt they can succeed; third-party proof is what lowers that perceived risk."
+    },
+    {
+      "gap": "Shelf tours and aesthetic posts outnumber care education.",
+      "type": "positioning",
+      "why_it_matters": "The feed signals 'plant decor' instead of 'we keep your plant alive', which is the subscription's real promise."
+    }
+  ],
+  "viral_patterns_observed": [
+    {
+      "pattern": "Plant rescue before/after",
+      "source_reference": "competitor_context.observed_patterns[0] and the brand's own rescue reels",
+      "hook_mechanic": "Dying plant in the first frame, healthy plant revealed at the end",
+      "format": "30-second reel",
+      "emotion": "relief",
+      "funnel_stage": "TOFU",
+      "commercial_intent": "low",
+      "why_it_works": "It dramatises the beginner's fear and its resolution in seconds.",
+      "adaptation_opportunity": "End on the care step that saved the plant and point to the RESCUE checklist.",
+      "risk_if_overused": "Turns into spectacle with no bridge to the offer."
+    },
+    {
+      "pattern": "Plant-doctor Q&A",
+      "source_reference": "competitor_context.observed_patterns[1]",
+      "hook_mechanic": "Common mistake called out in the first line",
+      "format": "talking-head short",
+      "emotion": "recognition",
+      "funnel_stage": "MOFU",
+      "commercial_intent": "medium",
+      "why_it_works": "Answering a real follower question signals expertise and access to help.",
+      "adaptation_opportunity": "Frame answers as a preview of the plant-care chat included in the subscription.",
+      "risk_if_overused": "Feels like homework if every video is a lesson."
+    }
+  ],
+  "opportunity_angles": [
+    {
+      "angle": "Rescue reels that end with the care routine and the RESCUE DM keyword",
+      "why": "Keeps the reach engine intact while adding the missing conversion bridge."
+    },
+    {
+      "angle": "Month-two subscriber stories",
+      "why": "Addresses the trust gap exactly where beginners are most likely to give up."
+    }
+  ],
+  "confidence_notes": "SYNTHETIC FIXTURE: hand-written sample output for the fictional Quillfern client, used by the offline demo and tests. It is not model output. On this synthetic evidence, hypotheses 1 and 2 are supported by the input; hypothesis 3 is plausible but only partially supported, because no post counts are provided."
+}

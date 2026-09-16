@@ -1,0 +1,23 @@
+{
+  "brand": {
+    "handle": "@handle",
+    "name": "Brand name",
+    "followers": 0,
+    "base": "City / country",
+    "website": "https://brand.example.com",
+    "bio": "Public bio exactly as it appears on the profile",
+    "highlights": ["Highlight 1", "Highlight 2"],
+    "content_observed": ["Content type 1 observed in the feed", "Content type 2"],
+    "funnel_observed": "Reach -> profile -> DM/CTA -> conversation -> sale (describe what you actually observed)",
+    "offer": "What exactly is sold (the real product, not the hook)"
+  },
+  "goal": "Business goal for this run (concrete, tied to leads or sales, not vanity)",
+  "constraints": [
+    "keep what already works",
+    "use the brand's own tone",
+    "never promise guaranteed results",
+    "do not sound like generic AI copy",
+    "quality over quantity"
+  ],
+  "analysis_hypotheses": ["Optional: a hypothesis the Brand Analyst should test against the evidence"]
+}

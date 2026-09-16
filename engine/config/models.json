@@ -1,0 +1,23 @@
+{
+  "notes": "Model ids are OpenRouter ids. CONTENT_ENGINE_MODEL overrides the model for every step. Raise max_tokens for a step if the provider reports truncation.",
+  "default": { "model": "anthropic/claude-sonnet-5", "max_tokens": 8000, "reasoning_effort": "high" },
+  "steps": {
+    "brand_analyst": { "model": "anthropic/claude-sonnet-5", "max_tokens": 8000, "reasoning_effort": "high" },
+    "growth_strategist": {
+      "model": "anthropic/claude-sonnet-5",
+      "max_tokens": 6000,
+      "reasoning_effort": "high"
+    },
+    "content_ideation": {
+      "model": "anthropic/claude-sonnet-5",
+      "max_tokens": 8000,
+      "reasoning_effort": "high"
+    },
+    "content_qa": { "model": "anthropic/claude-sonnet-5", "max_tokens": 12000, "reasoning_effort": "high" },
+    "orchestrator": {
+      "model": "anthropic/claude-sonnet-5",
+      "max_tokens": 12000,
+      "reasoning_effort": "medium"
+    }
+  }
+}

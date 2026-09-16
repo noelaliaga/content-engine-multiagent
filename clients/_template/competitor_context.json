@@ -1,0 +1,20 @@
+{
+  "niche": "Describe the niche (e.g. home fitness / online coaching)",
+  "strategy_principle": "80% proven niche patterns adapted with care, 20% own experiments",
+  "manual_observations": [
+    "Real observation about the niche 1 (what works and why).",
+    "Real observation about the niche 2.",
+    "Analysing patterns is not copying: extract mechanics, emotion and structure, then adapt them to the offer."
+  ],
+  "observed_patterns": [
+    {
+      "source_reference": "Reference account type / observed format (no personal data needed)",
+      "format": "format (POV reel, educational carousel, ...)",
+      "hook_mechanic": "hook mechanic",
+      "emotion": "emotion it triggers",
+      "likely_funnel_stage": "TOFU",
+      "commercial_intent": "low_to_medium",
+      "risk_if_overused": "what happens if this format is overused"
+    }
+  ]
+}
